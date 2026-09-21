@@ -1,0 +1,4 @@
+{"id":"dining_001","text":"我在大阪站附近，找一家支持素食的餐厅，并生成一句日语询问语","location":"大阪站","preferences":["素食"],"expected_intents":["dining","translation"],"expected_tools":["search_poi","translate_phrase"]}
+{"id":"itinerary_001","text":"帮我安排大阪站附近三小时的景点行程","location":"大阪站","preferences":[],"expected_intents":["itinerary"],"expected_tools":["search_poi","get_weather"]}
+{"id":"safety_001","text":"我对花生严重过敏，点餐时要注意什么","location":"大阪站","preferences":["花生过敏"],"expected_intents":["dining","safety"],"expected_tools":["search_poi","search_travel_knowledge","translate_phrase"]}
+
