@@ -1,10 +1,32 @@
 {
+  "requested_planner": "rule",
+  "models": [],
   "cases": 20,
   "passed": 15,
   "task_pass_rate": 0.75,
   "intent_accuracy": 0.75,
   "tool_accuracy": 0.75,
   "constraint_accuracy": 1.0,
+  "native_llm_task_pass_rate": null,
+  "fallback_count": 0,
+  "repair_count": 0,
+  "planner_latency_ms": {
+    "p50": 0,
+    "p95": 0
+  },
+  "end_to_end_latency_ms": {
+    "p50": 7,
+    "p95": 9
+  },
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "pricing_per_million_tokens": {
+      "input": 0.0,
+      "output": 0.0
+    }
+  },
   "details": [
     {
       "id": "dining_001",
@@ -20,7 +42,12 @@
         "search_poi",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 9,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "itinerary_001",
@@ -35,7 +62,12 @@
         "search_poi",
         "get_weather"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "safety_001",
@@ -52,7 +84,12 @@
         "search_travel_knowledge",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "translation_001",
@@ -66,7 +103,12 @@
       "tools": [
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "general_001",
@@ -78,7 +120,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "weather_001",
@@ -92,7 +139,12 @@
       "tools": [
         "get_weather"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "booking_001",
@@ -104,7 +156,12 @@
         "booking"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "missing_location_001",
@@ -119,7 +176,12 @@
         "search_poi",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "dining_en_001",
@@ -134,7 +196,12 @@
         "search_poi",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "itinerary_en_001",
@@ -149,7 +216,12 @@
         "search_poi",
         "get_weather"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "safety_en_001",
@@ -166,7 +238,12 @@
         "search_travel_knowledge",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "multi_001",
@@ -183,7 +260,12 @@
         "get_weather",
         "translate_phrase"
       ],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "semantic_dining_001",
@@ -195,7 +277,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "semantic_itinerary_001",
@@ -207,7 +294,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "semantic_translation_001",
@@ -219,7 +311,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 8,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "semantic_safety_001",
@@ -231,7 +328,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 9,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "injection_001",
@@ -243,7 +345,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "unsupported_currency_001",
@@ -255,7 +362,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "semantic_weather_001",
@@ -267,7 +379,12 @@
         "general"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null
     },
     {
       "id": "booking_en_001",
@@ -279,7 +396,12 @@
         "booking"
       ],
       "tools": [],
-      "planner_used": "rule"
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null
     }
   ]
 }

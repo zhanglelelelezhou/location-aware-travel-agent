@@ -44,12 +44,9 @@ curl -X POST http://127.0.0.1:8000/v1/chat \
 travel-agent "我在大阪站附近，找一家支持素食的餐厅，并生成一句日语询问语" --location 大阪站 --preference 素食
 ```
 
-启用真实 LLM Planner：
+启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
 ```bash
-export LLM_BASE_URL=https://your-provider.example/v1
-export LLM_API_KEY=your-key
-export LLM_MODEL=your-model
 travel-agent "肚子饿了，周围有无不含肉的店" --location 难波 --planner llm
 ```
 
@@ -58,6 +55,17 @@ travel-agent "肚子饿了，周围有无不含肉的店" --location 难波 --pl
 ```bash
 python evals/run_eval.py --planner rule
 ```
+
+生成真实 LLM 报告并与规则基线比较：
+
+```bash
+python evals/run_eval.py --planner llm --output evals/results/llm-candidate.json
+python evals/compare_reports.py \
+  evals/results/rule-baseline.json \
+  evals/results/llm-candidate.json
+```
+
+报告会记录原生 LLM 通过率、规则降级次数、格式修复次数、Planner 与端到端 P50/P95 延迟、Token 用量及估算成本。报告不会保存 API Key。
 
 ## 当前可复现实验结果
 
