@@ -6,6 +6,7 @@ from travel_agent.tools.mock import (
     MockPoiSearchTool,
     MockTranslateTool,
     MockTravelKnowledgeTool,
+    MockWeatherTool,
 )
 
 
@@ -73,6 +74,13 @@ def test_device_coordinates_are_propagated_to_location_tools() -> None:
         and call.arguments["longitude"] == 139.6917
         for call in response.trace.plan
     )
+    poi_call = next(call for call in response.trace.plan if call.name == "search_poi")
+    assert poi_call.arguments["categories"] == [
+        "museum",
+        "attraction",
+        "park",
+        "place_of_worship",
+    ]
 
 
 def test_unknown_request_is_honest_about_mock_limit() -> None:
@@ -164,3 +172,52 @@ def test_weather_provider_failure_is_exposed_without_fabricated_result() -> None
     assert response.trace.retry_count == 1
     assert response.trace.executions[0].error == "weather provider unavailable"
     assert "工具暂时不可用" in response.answer
+
+
+def test_unverified_poi_preference_is_not_presented_as_a_match() -> None:
+    class EvidenceAwarePoiTool:
+        name = "search_poi"
+        description = "Return a candidate with an unverified preference."
+
+        def invoke(self, arguments: dict[str, object]) -> dict[str, object]:
+            return {
+                "location": "东京站",
+                "latitude": 35.6812,
+                "longitude": 139.7671,
+                "radius_m": 1500,
+                "provider": "test",
+                "attribution": "test data",
+                "verified_preferences": [],
+                "unverified_preferences": ["安静"],
+                "results": [
+                    {
+                        "id": "test/1",
+                        "name": "Candidate Cafe",
+                        "category": "cafe",
+                        "distance_m": 240,
+                        "walking_minutes": 3,
+                        "supports": [],
+                        "source": "test://poi/1",
+                    }
+                ],
+            }
+
+    registry = ToolRegistry(
+        [
+            EvidenceAwarePoiTool(),
+            MockWeatherTool(),
+            MockTranslateTool(),
+            MockTravelKnowledgeTool(),
+        ]
+    )
+    response = run_agent(
+        TravelRequest(
+            text="东京站附近找一家安静的餐厅",
+            location="东京站",
+            preferences=["安静"],
+        ),
+        registry=registry,
+    )
+
+    assert "候选地点" in response.answer
+    assert "尚未验证：安静" in response.answer

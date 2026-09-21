@@ -10,6 +10,15 @@ class PolicyOutcome(BaseModel):
     adjustments: list[str] = Field(default_factory=list)
 
 
+def poi_categories_for_intents(intents: list[str]) -> list[str]:
+    categories: list[str] = []
+    if "dining" in intents:
+        categories.extend(["restaurant", "cafe"])
+    if "itinerary" in intents:
+        categories.extend(["museum", "attraction", "park", "place_of_worship"])
+    return categories
+
+
 def enforce_travel_policy(
     decision: PlanningDecision, request: TravelRequest
 ) -> PolicyOutcome:
@@ -45,6 +54,8 @@ def enforce_travel_policy(
         normalized_name = False
         injected_coordinates = False
         removed_coordinates = False
+        normalized_poi_constraints = False
+        poi_categories = poi_categories_for_intents(list(decision.intents))
         for call in tool_calls:
             if call.name in {"get_weather", "search_poi"}:
                 arguments = dict(call.arguments)
@@ -61,6 +72,13 @@ def enforce_travel_policy(
                     removed_coordinates = removed_coordinates or (
                         removed_latitude is not None or removed_longitude is not None
                     )
+                if call.name == "search_poi":
+                    if arguments.get("preferences") != request.preferences:
+                        arguments["preferences"] = request.preferences
+                        normalized_poi_constraints = True
+                    if poi_categories and arguments.get("categories") != poi_categories:
+                        arguments["categories"] = poi_categories
+                        normalized_poi_constraints = True
                 revised_calls.append(call.model_copy(update={"arguments": arguments}))
             else:
                 revised_calls.append(call)
@@ -71,6 +89,8 @@ def enforce_travel_policy(
             adjustments.append("location:inject_coordinates")
         if removed_coordinates:
             adjustments.append("location:remove_untrusted_coordinates")
+        if normalized_poi_constraints:
+            adjustments.append("poi:normalize_constraints")
 
     if (
         "itinerary" in decision.intents
@@ -88,6 +108,7 @@ def enforce_travel_policy(
                         "latitude": request.latitude,
                         "longitude": request.longitude,
                         "preferences": request.preferences,
+                        "categories": poi_categories_for_intents(list(decision.intents)),
                     },
                 )
             )

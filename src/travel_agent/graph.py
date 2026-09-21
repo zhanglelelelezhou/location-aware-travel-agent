@@ -123,9 +123,18 @@ def _respond(state: AgentState) -> dict[str, Any]:
             output = execution.output or {}
             if execution.name == "search_poi" and output.get("results"):
                 poi = output["results"][0]
-                parts.append(
-                    f"推荐 {poi['name']}，从{output['location']}步行约{poi['walking_minutes']}分钟。"
+                verb = "候选地点是" if output.get("unverified_preferences") else "推荐"
+                poi_answer = (
+                    f"{verb} {poi['name']}，从{output['location']}步行约"
+                    f"{poi['walking_minutes']}分钟。"
                 )
+                if output.get("unverified_preferences"):
+                    poi_answer += " 以下偏好缺少标签证据，尚未验证：" + "、".join(
+                        output["unverified_preferences"]
+                    ) + "。"
+                parts.append(poi_answer)
+            elif execution.name == "search_poi":
+                parts.append("在指定范围内没有找到带有相应标签证据的地点。")
             elif execution.name == "get_weather":
                 weather = f"当前天气为 {output['condition']}，约 {output['temperature_c']}°C"
                 if output.get("apparent_temperature_c") is not None:
