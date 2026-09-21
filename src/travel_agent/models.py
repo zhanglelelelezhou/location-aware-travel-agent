@@ -18,9 +18,17 @@ Intent = Literal[
 class TravelRequest(BaseModel):
     text: str = Field(min_length=1, max_length=2_000)
     location: str | None = None
+    latitude: float | None = Field(default=None, ge=-90, le=90)
+    longitude: float | None = Field(default=None, ge=-180, le=180)
     target_language: str = "ja"
     preferences: list[str] = Field(default_factory=list)
     user_id: str = "demo-user"
+
+    @model_validator(mode="after")
+    def validate_coordinate_pair(self) -> TravelRequest:
+        if (self.latitude is None) != (self.longitude is None):
+            raise ValueError("latitude and longitude must be provided together")
+        return self
 
 
 class PlannedToolCall(BaseModel):

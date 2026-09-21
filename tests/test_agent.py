@@ -1,6 +1,12 @@
 from travel_agent.graph import run_agent
 from travel_agent.models import TravelRequest
 from travel_agent.planner import LLMPlanner, ProviderResult
+from travel_agent.tools.base import ToolRegistry
+from travel_agent.tools.mock import (
+    MockPoiSearchTool,
+    MockTranslateTool,
+    MockTravelKnowledgeTool,
+)
 
 
 class DiningProvider:
@@ -50,6 +56,23 @@ def test_itinerary_checks_weather() -> None:
 
     assert "雨具" in response.answer
     assert [call.name for call in response.trace.plan] == ["search_poi", "get_weather"]
+
+
+def test_device_coordinates_are_propagated_to_location_tools() -> None:
+    response = run_agent(
+        TravelRequest(
+            text="帮我安排东京半日游",
+            location="东京",
+            latitude=35.6895,
+            longitude=139.6917,
+        )
+    )
+
+    assert all(
+        call.arguments["latitude"] == 35.6895
+        and call.arguments["longitude"] == 139.6917
+        for call in response.trace.plan
+    )
 
 
 def test_unknown_request_is_honest_about_mock_limit() -> None:
@@ -116,3 +139,28 @@ def test_safety_advice_does_not_trigger_unrequested_search_or_translation() -> N
     )
 
     assert [call.name for call in response.trace.plan] == ["search_travel_knowledge"]
+
+
+def test_weather_provider_failure_is_exposed_without_fabricated_result() -> None:
+    class FailingWeatherTool:
+        name = "get_weather"
+        description = "Always unavailable in this test."
+
+        def invoke(self, arguments: dict[str, object]) -> dict[str, object]:
+            raise RuntimeError("weather provider unavailable")
+
+    registry = ToolRegistry(
+        [
+            MockPoiSearchTool(),
+            FailingWeatherTool(),
+            MockTranslateTool(),
+            MockTravelKnowledgeTool(),
+        ]
+    )
+    response = run_agent(
+        TravelRequest(text="东京今天天气如何", location="东京"), registry=registry
+    )
+
+    assert response.trace.retry_count == 1
+    assert response.trace.executions[0].error == "weather provider unavailable"
+    assert "工具暂时不可用" in response.answer

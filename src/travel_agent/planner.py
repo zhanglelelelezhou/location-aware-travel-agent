@@ -77,7 +77,12 @@ def detect_intents(text: str) -> list[Intent]:
 def build_rule_decision(request: TravelRequest) -> PlanningDecision:
     intents = detect_intents(request.text)
     calls: list[PlannedToolCall] = []
-    common = {"location": request.location, "preferences": request.preferences}
+    common = {
+        "location": request.location,
+        "latitude": request.latitude,
+        "longitude": request.longitude,
+        "preferences": request.preferences,
+    }
     normalized = request.text.lower()
     venue_discovery = any(
         keyword in normalized for keyword in ("餐厅", "附近", "周围", "restaurant", "nearby", "店")
@@ -87,7 +92,14 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
             calls.append(PlannedToolCall(name="search_poi", arguments=common))
         if "itinerary" in intents or "weather" in intents:
             calls.append(
-                PlannedToolCall(name="get_weather", arguments={"location": request.location})
+                PlannedToolCall(
+                    name="get_weather",
+                    arguments={
+                        "location": request.location,
+                        "latitude": request.latitude,
+                        "longitude": request.longitude,
+                    },
+                )
             )
         if "safety" in intents:
             calls.append(
