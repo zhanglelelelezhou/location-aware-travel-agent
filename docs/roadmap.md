@@ -18,7 +18,8 @@
 - [x] 确定性业务策略层与独立留出评测集
 - [x] Open-Meteo 真实天气 adapter 与契约测试
 - [x] OpenStreetMap Overpass 真实 POI adapter、距离排序与证据过滤
-- POI、天气与翻译 MCP Server
+- [x] POI 与天气 MCP Server（stdio、Streamable HTTP、协议级测试）
+- 翻译与旅行知识 MCP Server
 - 工具 schema 校验、超时、重试和降级
 - SSE 流式事件
 
