@@ -40,6 +40,38 @@ def enforce_travel_policy(
             tool_calls = []
             adjustments.append("missing_input:block_tool_execution")
 
+    if request.location and tool_calls:
+        revised_calls: list[PlannedToolCall] = []
+        normalized_name = False
+        injected_coordinates = False
+        removed_coordinates = False
+        for call in tool_calls:
+            if call.name in {"get_weather", "search_poi"}:
+                arguments = dict(call.arguments)
+                if arguments.get("location") != request.location:
+                    arguments["location"] = request.location
+                    normalized_name = True
+                if request.latitude is not None and request.longitude is not None:
+                    arguments["latitude"] = request.latitude
+                    arguments["longitude"] = request.longitude
+                    injected_coordinates = True
+                else:
+                    removed_latitude = arguments.pop("latitude", None)
+                    removed_longitude = arguments.pop("longitude", None)
+                    removed_coordinates = removed_coordinates or (
+                        removed_latitude is not None or removed_longitude is not None
+                    )
+                revised_calls.append(call.model_copy(update={"arguments": arguments}))
+            else:
+                revised_calls.append(call)
+        tool_calls = revised_calls
+        if normalized_name:
+            adjustments.append("location:normalize_name")
+        if injected_coordinates:
+            adjustments.append("location:inject_coordinates")
+        if removed_coordinates:
+            adjustments.append("location:remove_untrusted_coordinates")
+
     if (
         "itinerary" in decision.intents
         and "booking" not in decision.intents
@@ -53,6 +85,8 @@ def enforce_travel_policy(
                     name="search_poi",
                     arguments={
                         "location": request.location,
+                        "latitude": request.latitude,
+                        "longitude": request.longitude,
                         "preferences": request.preferences,
                     },
                 )
@@ -61,7 +95,12 @@ def enforce_travel_policy(
         if "get_weather" not in names:
             tool_calls.append(
                 PlannedToolCall(
-                    name="get_weather", arguments={"location": request.location}
+                    name="get_weather",
+                    arguments={
+                        "location": request.location,
+                        "latitude": request.latitude,
+                        "longitude": request.longitude,
+                    },
                 )
             )
             adjustments.append("itinerary:add_get_weather")

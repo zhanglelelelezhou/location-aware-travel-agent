@@ -21,3 +21,11 @@ def test_chat_returns_trace() -> None:
     assert body["trace"]["executions"]
     assert "answer" in body
 
+
+def test_chat_rejects_incomplete_coordinate_pair() -> None:
+    response = client.post(
+        "/v1/chat",
+        json={"text": "东京天气", "location": "东京", "latitude": 35.6895},
+    )
+
+    assert response.status_code == 422

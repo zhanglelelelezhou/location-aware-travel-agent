@@ -127,9 +127,13 @@ def _respond(state: AgentState) -> dict[str, Any]:
                     f"推荐 {poi['name']}，从{output['location']}步行约{poi['walking_minutes']}分钟。"
                 )
             elif execution.name == "get_weather":
-                parts.append(
-                    f"当前天气为 {output['condition']}，约 {output['temperature_c']}°C，建议准备雨具。"
-                )
+                weather = f"当前天气为 {output['condition']}，约 {output['temperature_c']}°C"
+                if output.get("apparent_temperature_c") is not None:
+                    weather += f"，体感 {output['apparent_temperature_c']}°C"
+                rainy_codes = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99}
+                if output.get("precipitation_mm", 0) > 0 or output.get("weather_code") in rainy_codes:
+                    weather += "，建议准备雨具"
+                parts.append(weather + "。")
             elif execution.name == "translate_phrase":
                 parts.append(f"可向店员询问：{output['translated_text']}")
             elif execution.name == "search_travel_knowledge" and output.get("passages"):

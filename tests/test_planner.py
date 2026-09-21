@@ -227,3 +227,36 @@ def test_policy_blocks_tool_execution_while_booking_awaits_confirmation() -> Non
     assert result.decision.tool_calls == []
     assert result.decision.needs_confirmation
     assert result.policy_adjustments == ["booking:block_tool_execution"]
+
+
+def test_policy_rejects_llm_hallucinated_coordinates() -> None:
+    provider = SequenceProvider(
+        [
+            {
+                "intents": ["weather"],
+                "missing_fields": [],
+                "tool_calls": [
+                    {
+                        "name": "get_weather",
+                        "arguments": {
+                            "location": "错误地点",
+                            "latitude": 0,
+                            "longitude": 0,
+                        },
+                    }
+                ],
+                "needs_confirmation": False,
+            }
+        ]
+    )
+
+    result = LLMPlanner(provider).plan(
+        TravelRequest(text="东京天气如何", location="东京")
+    )
+    arguments = result.decision.tool_calls[0].arguments
+
+    assert arguments == {"location": "东京"}
+    assert result.policy_adjustments == [
+        "location:normalize_name",
+        "location:remove_untrusted_coordinates",
+    ]

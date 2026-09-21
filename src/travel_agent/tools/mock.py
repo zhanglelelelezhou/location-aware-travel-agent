@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from travel_agent.tools.weather import WeatherObservation
+
 
 class MockPoiSearchTool:
     name = "search_poi"
@@ -35,12 +37,22 @@ class MockWeatherTool:
     description = "Get weather conditions for itinerary planning."
 
     def invoke(self, arguments: dict[str, Any]) -> dict[str, Any]:
-        return {
-            "location": arguments.get("location") or "当前位置",
-            "condition": "light rain",
-            "temperature_c": 21,
-            "source": "mock://weather/current",
-        }
+        location = arguments.get("location") or "当前位置"
+        return WeatherObservation(
+            location=location,
+            resolved_location=location,
+            condition="light rain",
+            temperature_c=21,
+            apparent_temperature_c=20,
+            precipitation_mm=0.5,
+            wind_speed_kmh=12,
+            weather_code=61,
+            observed_at="2026-01-01T12:00",
+            timezone="Asia/Tokyo",
+            resolution_method="mock",
+            provider="mock",
+            source="mock://weather/current",
+        ).model_dump(exclude_none=True)
 
 
 class MockTranslateTool:
@@ -74,4 +86,3 @@ class MockTravelKnowledgeTool:
                 }
             ]
         }
-

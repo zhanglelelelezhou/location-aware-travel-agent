@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气工具、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -43,6 +43,18 @@ curl -X POST http://127.0.0.1:8000/v1/chat \
 ```bash
 travel-agent "我在大阪站附近，找一家支持素食的餐厅，并生成一句日语询问语" --location 大阪站 --preference 素食
 ```
+
+调用真实天气工具（Open-Meteo 无需 API Key）。位置感知设备应优先传经纬度，避免同名地点误解析：
+
+```bash
+travel-agent "东京现在天气怎么样" \
+  --location 东京 \
+  --latitude 35.6895 \
+  --longitude 139.6917 \
+  --tools open-meteo
+```
+
+服务模式可在 `.env` 中设置 `AGENT_PROVIDER=open-meteo`。当前只有天气为真实服务，POI、翻译和知识工具仍使用 Mock；文本地名仅作为回退，候选不唯一时会明确失败并要求坐标。
 
 启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
@@ -97,7 +109,7 @@ Request
   -> Understand
   -> Plan (semantic LLM / rule fallback)
   -> Enforce deterministic policy
-  -> Execute tools
+  -> Execute tools (Mock or Open-Meteo weather)
   -> Verify -- failed once --> Recover -> Execute
        |
        +-- success / retry exhausted --> Respond
@@ -117,6 +129,8 @@ Request
 - [x] DeepSeek 真实调用、成本与延迟对照
 - [x] 确定性业务策略层与可审计补正
 - [x] 20 条冻结留出集与数据集哈希
+- [x] Open-Meteo 真实天气适配器与 Mock 共用输出契约
+- [x] 设备坐标优先、地名歧义拒绝与供应商错误归一化
 - [ ] MCP Server：POI、天气、翻译
 - [ ] 混合 RAG、Rerank 和引用溯源
 - [ ] SSE 流式响应、会话记忆和人工确认
@@ -126,6 +140,7 @@ Request
 ## 文档
 
 - [架构与边界](docs/architecture.md)
+- [工具契约](docs/tool-contracts.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)
 - [评测说明](docs/evaluation.md)
