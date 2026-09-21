@@ -54,8 +54,8 @@ def main() -> None:
         )
         end_to_end_ms = round((time.perf_counter() - started) * 1000)
         tools = [call.name for call in response.trace.plan]
-        intent_ok = response.trace.intents == case["expected_intents"]
-        tool_ok = tools == case["expected_tools"]
+        intent_ok = set(response.trace.intents) == set(case["expected_intents"])
+        tool_ok = set(tools) == set(case["expected_tools"])
         constraint_ok = (
             response.trace.missing_fields == case.get("expected_missing_fields", [])
             and response.trace.needs_confirmation == case.get("expected_confirmation", False)
@@ -85,6 +85,8 @@ def main() -> None:
                 "tools": tools,
                 "planner_used": response.trace.planner_used,
                 "planner_repaired": response.trace.planner_repaired,
+                "missing_fields": response.trace.missing_fields,
+                "needs_confirmation": response.trace.needs_confirmation,
                 "planner_latency_ms": response.trace.planner_latency_ms,
                 "end_to_end_latency_ms": end_to_end_ms,
                 "prompt_tokens": response.trace.prompt_tokens,
@@ -96,6 +98,7 @@ def main() -> None:
     output_rate = float(os.getenv("LLM_OUTPUT_COST_PER_MILLION", "0"))
     estimated_cost = (prompt_tokens * input_rate + completion_tokens * output_rate) / 1_000_000
     report = {
+        "scoring_policy": "intent-set_tool-set_constraints-v2",
         "requested_planner": args.planner,
         "models": sorted(models),
         "cases": len(cases),

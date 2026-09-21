@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Intent = Literal[
     "dining",
@@ -37,6 +37,20 @@ class PlanningDecision(BaseModel):
     missing_fields: list[str] = Field(default_factory=list)
     tool_calls: list[PlannedToolCall] = Field(default_factory=list)
     needs_confirmation: bool = False
+
+    @model_validator(mode="after")
+    def validate_execution_safety(self) -> PlanningDecision:
+        unknown_missing = set(self.missing_fields) - {"location", "text"}
+        if unknown_missing:
+            raise ValueError("missing_fields may contain only location or text")
+        if self.missing_fields and self.tool_calls:
+            raise ValueError("tool_calls must be empty while required fields are missing")
+        if "booking" in self.intents and not self.needs_confirmation:
+            raise ValueError("booking requests require explicit confirmation")
+        names = [call.name for call in self.tool_calls]
+        if len(names) != len(set(names)):
+            raise ValueError("duplicate tool calls are not allowed")
+        return self
 
 
 class ToolExecution(BaseModel):

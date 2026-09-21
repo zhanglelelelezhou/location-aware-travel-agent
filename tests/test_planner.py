@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import httpx
@@ -95,16 +96,16 @@ def test_llm_planner_falls_back_after_two_invalid_outputs() -> None:
 
     assert result.planner_used == "rule_fallback"
     assert result.error
-    assert [call.name for call in result.decision.tool_calls] == [
-        "search_poi",
-        "translate_phrase",
-    ]
+    assert [call.name for call in result.decision.tool_calls] == ["search_poi"]
 
 
 def test_openai_compatible_provider_parses_usage_and_json() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.url.path == "/v1/chat/completions"
         assert request.headers["Authorization"] == "Bearer test-key"
+        request_body = json.loads(request.content)
+        assert request_body["thinking"] == {"type": "disabled"}
+        assert request_body["max_tokens"] == 900
         return httpx.Response(
             200,
             json={
@@ -123,6 +124,8 @@ def test_openai_compatible_provider_parses_usage_and_json() -> None:
         base_url="https://example.test/v1",
         api_key="test-key",
         model="test-model",
+        thinking_mode="disabled",
+        max_tokens=900,
         client=httpx.Client(transport=httpx.MockTransport(handler)),
     )
     result = provider.generate_json(system_prompt="plan", user_payload={"text": "hello"})
@@ -130,3 +133,30 @@ def test_openai_compatible_provider_parses_usage_and_json() -> None:
     assert result.payload["intents"] == ["general"]
     assert result.prompt_tokens == 12
     assert result.completion_tokens == 7
+
+
+def test_llm_planner_retries_empty_content_error() -> None:
+    class EmptyThenValidProvider:
+        def __init__(self) -> None:
+            self.calls = 0
+
+        def generate_json(self, **_: object) -> ProviderResult:
+            self.calls += 1
+            if self.calls == 1:
+                raise ValueError("Planner returned empty content.")
+            return ProviderResult(
+                payload={
+                    "intents": ["general"],
+                    "missing_fields": [],
+                    "tool_calls": [],
+                    "needs_confirmation": False,
+                },
+                model="deepseek-flash",
+            )
+
+    provider = EmptyThenValidProvider()
+    result = LLMPlanner(provider).plan(TravelRequest(text="你好"))
+
+    assert provider.calls == 2
+    assert result.repaired
+    assert result.model == "deepseek-flash"

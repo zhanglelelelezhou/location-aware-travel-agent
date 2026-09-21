@@ -78,6 +78,18 @@ def test_missing_location_stops_before_tool_execution() -> None:
     response = run_agent(TravelRequest(text="附近有什么素食餐厅", preferences=["素食"]))
 
     assert response.trace.missing_fields == ["location"]
-    assert response.trace.needs_confirmation
+    assert not response.trace.needs_confirmation
     assert response.trace.executions == []
     assert "location" in response.answer
+
+
+def test_safety_advice_does_not_trigger_unrequested_search_or_translation() -> None:
+    response = run_agent(
+        TravelRequest(
+            text="我对花生严重过敏，点餐时要注意什么",
+            location="大阪站",
+            preferences=["花生过敏"],
+        )
+    )
+
+    assert [call.name for call in response.trace.plan] == ["search_travel_knowledge"]
