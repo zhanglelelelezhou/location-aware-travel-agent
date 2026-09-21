@@ -3,6 +3,7 @@ import json
 
 from travel_agent.graph import run_agent
 from travel_agent.models import TravelRequest
+from travel_agent.planner import build_planner_from_env
 
 
 def main() -> None:
@@ -11,6 +12,7 @@ def main() -> None:
     parser.add_argument("--location")
     parser.add_argument("--preference", action="append", default=[])
     parser.add_argument("--target-language", default="ja")
+    parser.add_argument("--planner", choices=["rule", "llm"], default="rule")
     args = parser.parse_args()
 
     response = run_agent(
@@ -19,11 +21,11 @@ def main() -> None:
             location=args.location,
             preferences=args.preference,
             target_language=args.target_language,
-        )
+        ),
+        planner=build_planner_from_env(args.planner),
     )
     print(json.dumps(response.model_dump(), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
     main()
-
