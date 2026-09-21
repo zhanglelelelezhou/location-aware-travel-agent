@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI 工具、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI 工具、MCP Server、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -67,6 +67,29 @@ travel-agent "东京站附近有什么餐厅" \
 ```
 
 `open-data` 模式使用 OpenStreetMap Overpass 搜索附近地点，结果携带距离、标签证据、OSM 来源链接和署名。真实 POI 必须提供可信坐标；公共 Overpass 实例仅用于低频作品集演示，生产部署需要缓存、限流并自建或更换供应商。
+
+## MCP Server
+
+天气和 POI adapter 同时通过 MCP 暴露，供任意兼容 Host 发现和调用。默认使用本地 stdio：
+
+```bash
+travel-agent-mcp
+```
+
+也可以启动本地 Streamable HTTP：
+
+```bash
+travel-agent-mcp --transport streamable-http --host 127.0.0.1 --port 8001
+# MCP endpoint: http://127.0.0.1:8001/mcp
+```
+
+服务启动后可在另一个终端验证协议协商与工具发现：
+
+```bash
+python scripts/mcp_probe.py http://127.0.0.1:8001/mcp
+```
+
+两个 MCP 工具都声明为只读、非破坏、幂等且访问外部数据。输入 JSON Schema 直接来自类型注解和 Pydantic 约束，非法类别、坐标、半径和结果数量会在调用 adapter 前被协议层拒绝。详见 [MCP Server 说明](docs/mcp-server.md)。
 
 启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
@@ -144,7 +167,8 @@ Request
 - [x] Open-Meteo 真实天气适配器与 Mock 共用输出契约
 - [x] 设备坐标优先、地名歧义拒绝与供应商错误归一化
 - [x] OpenStreetMap 真实 POI、距离排序与偏好证据过滤
-- [ ] MCP Server：POI、天气、翻译
+- [x] MCP Server：天气与 POI、stdio 与 Streamable HTTP
+- [ ] MCP Server：翻译与旅行知识
 - [ ] 混合 RAG、Rerank 和引用溯源
 - [ ] SSE 流式响应、会话记忆和人工确认
 - [ ] 多次重复评测、参数准确率与 50+ 条评测集
@@ -154,6 +178,7 @@ Request
 
 - [架构与边界](docs/architecture.md)
 - [工具契约](docs/tool-contracts.md)
+- [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)
 - [评测说明](docs/evaluation.md)

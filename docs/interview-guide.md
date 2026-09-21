@@ -75,3 +75,15 @@ LLM 不能生成任意 Overpass QL。adapter 只接收类别白名单、可信�
 ## 19. 怎么证明推荐真的符合“纯素”偏好？
 
 不能靠地点名字或模型常识猜测。当前实现要求 OSM 的 `diet:vegan=yes` 或 `only` 标签，才会把该地点作为纯素匹配返回。清真、素食和无麸质同理。对于“安静”“适合约会”等当前数据无法证明的偏好，系统会保留候选但标记为未验证，并在回答中明确说明，避免把检索召回误写成事实。
+
+## 20. 为什么要做 MCP，普通函数调用不够吗？
+
+项目内部调用当然可以直接使用 Python 接口，但这会把工具绑定在一个 Agent 实现里。MCP 让兼容 Host 通过统一协议发现工具、读取 Schema 和调用结构化结果，天气与 POI 能被其他 Agent 复用。我的实现没有为了 MCP 重写业务逻辑：wrapper 只负责协议适配，adapter 和输出模型与 LangGraph 共用。
+
+## 21. 怎么证明 MCP Server 真的能工作？
+
+我没有只测试被装饰的 Python 函数。测试使用官方 `Client(server)` 完成协议协商、`tools/list`、Schema 与 annotations 检查以及 `tools/call`；另一个测试通过 stdio 启动真实子进程并发现两个工具。非法类别和超大半径会在进入 adapter 前返回 MCP 错误结果。
+
+## 22. MCP 工具标记为只读就安全吗？
+
+不是。annotations 是给 Host 和模型的规划提示，不是安全边界。真正的边界仍在服务端：坐标范围、类别白名单、查询半径、返回数量、超时和供应商错误都由 Schema 与 adapter 强制执行。stdio 的边界是本地启动进程；Streamable HTTP 上线时还必须增加认证、TLS、Host 校验和速率限制。
