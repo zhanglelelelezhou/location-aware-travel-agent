@@ -1,0 +1,285 @@
+{
+  "cases": 20,
+  "passed": 15,
+  "task_pass_rate": 0.75,
+  "intent_accuracy": 0.75,
+  "tool_accuracy": 0.75,
+  "constraint_accuracy": 1.0,
+  "details": [
+    {
+      "id": "dining_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "translation"
+      ],
+      "tools": [
+        "search_poi",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "itinerary_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "safety_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "safety"
+      ],
+      "tools": [
+        "search_poi",
+        "search_travel_knowledge",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "translation_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "translation"
+      ],
+      "tools": [
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "general_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "weather_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "weather"
+      ],
+      "tools": [
+        "get_weather"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "booking_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "missing_location_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [
+        "search_poi",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "dining_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [
+        "search_poi",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "itinerary_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "safety_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "safety"
+      ],
+      "tools": [
+        "search_poi",
+        "search_travel_knowledge",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "multi_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary",
+        "translation"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather",
+        "translate_phrase"
+      ],
+      "planner_used": "rule"
+    },
+    {
+      "id": "semantic_dining_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "semantic_itinerary_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "semantic_translation_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "semantic_safety_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "injection_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "unsupported_currency_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "semantic_weather_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    },
+    {
+      "id": "booking_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule"
+    }
+  ]
+}
