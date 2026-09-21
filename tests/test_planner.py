@@ -160,3 +160,70 @@ def test_llm_planner_retries_empty_content_error() -> None:
     assert provider.calls == 2
     assert result.repaired
     assert result.model == "deepseek-flash"
+
+
+def test_policy_completes_itinerary_tool_plan_and_records_adjustment() -> None:
+    provider = SequenceProvider(
+        [
+            {
+                "intents": ["itinerary"],
+                "missing_fields": [],
+                "tool_calls": [
+                    {"name": "get_weather", "arguments": {"location": "京都"}}
+                ],
+                "needs_confirmation": False,
+            }
+        ]
+    )
+
+    result = LLMPlanner(provider).plan(
+        TravelRequest(text="安排京都半日游", location="京都")
+    )
+
+    assert {call.name for call in result.decision.tool_calls} == {
+        "search_poi",
+        "get_weather",
+    }
+    assert result.policy_adjustments == ["itinerary:add_search_poi"]
+
+
+def test_policy_requires_location_before_itinerary_tools() -> None:
+    provider = SequenceProvider(
+        [
+            {
+                "intents": ["itinerary"],
+                "missing_fields": [],
+                "tool_calls": [],
+                "needs_confirmation": False,
+            }
+        ]
+    )
+
+    result = LLMPlanner(provider).plan(TravelRequest(text="帮我安排半日游"))
+
+    assert result.decision.missing_fields == ["location"]
+    assert result.decision.tool_calls == []
+    assert result.policy_adjustments == ["itinerary:require_location"]
+
+
+def test_policy_blocks_tool_execution_while_booking_awaits_confirmation() -> None:
+    provider = SequenceProvider(
+        [
+            {
+                "intents": ["booking"],
+                "missing_fields": [],
+                "tool_calls": [
+                    {"name": "search_poi", "arguments": {"location": "大阪"}}
+                ],
+                "needs_confirmation": True,
+            }
+        ]
+    )
+
+    result = LLMPlanner(provider).plan(
+        TravelRequest(text="帮我预约大阪的晚餐", location="大阪")
+    )
+
+    assert result.decision.tool_calls == []
+    assert result.decision.needs_confirmation
+    assert result.policy_adjustments == ["booking:block_tool_execution"]

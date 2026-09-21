@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 2，已具备规则基线、可替换的结构化 LLM Planner、格式修复与规则降级。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -14,7 +14,7 @@
 4. 校验工具执行结果并进行一次受控恢复；
 5. 返回答案以及可审计的执行轨迹。
 
-规则 Planner 保证任何人都能本地复现；LLM Planner 通过同一接口接入任意 OpenAI-compatible 服务。模型输出必须通过 Pydantic Schema 和工具白名单校验，首次失败会要求模型修复，第二次失败则降级到规则 Planner。
+规则 Planner 保证任何人都能本地复现；LLM Planner 通过同一接口接入任意 OpenAI-compatible 服务。模型输出必须通过 Pydantic Schema 和工具白名单校验，首次失败会要求模型修复，第二次失败则降级到规则 Planner。合法计划还会经过确定性策略层：例如行程任务必须同时包含 POI 与天气工具，预订任务在确认前不能执行工具。所有自动补正均写入 trace。
 
 ## 快速开始
 
@@ -56,6 +56,15 @@ travel-agent "肚子饿了，周围有无不含肉的店" --location 难波 --pl
 python evals/run_eval.py --planner rule
 ```
 
+运行冻结留出集：
+
+```bash
+python evals/run_eval.py \
+  --planner llm \
+  --cases evals/holdout_cases.jsonl \
+  --output evals/results/deepseek-flash-holdout.json
+```
+
 生成真实 LLM 报告并与规则基线比较：
 
 ```bash
@@ -65,28 +74,29 @@ python evals/compare_reports.py \
   evals/results/llm-candidate.json
 ```
 
-报告会记录原生 LLM 通过率、规则降级次数、格式修复次数、Planner 与端到端 P50/P95 延迟、Token 用量及估算成本。报告不会保存 API Key。
+报告会记录数据集路径与 SHA-256、原生 LLM 通过率、策略补正、规则降级、格式修复、Planner 与端到端 P50/P95 延迟、Token 用量及估算成本。报告不会保存 API Key。
 
 ## 当前可复现实验结果
 
-20 条开发期固定用例上的规则 Planner 与 `deepseek-flash` 单次对照：
+20 条开发集与 20 条冻结留出集上的单次对照：
 
-| 指标 | 规则 Planner | DeepSeek | 变化 |
+| 数据集 | 规则 Planner | DeepSeek + 策略层 | 变化 |
 | --- | ---: | ---: | ---: |
-| 完整任务通过率 | 55% | 85% | +30 pp |
-| 意图准确率 | 55% | 100% | +45 pp |
-| 工具集合准确率 | 80% | 85% | +5 pp |
-| 缺失信息与确认约束准确率 | 95% | 100% | +5 pp |
-| 端到端 P95 延迟 | 7 ms | 949 ms | +942 ms |
+| 开发集完整任务通过率 | 55% | 95% | +40 pp |
+| 留出集完整任务通过率 | 50% | 85% | +35 pp |
+| 留出集意图准确率 | 60% | 90% | +30 pp |
+| 留出集工具集合准确率 | 55% | 95% | +40 pp |
+| 留出集约束准确率 | 90% | 95% | +5 pp |
 
-DeepSeek 本轮使用 10,957 个输入 Token、996 个输出 Token，按配置的保守价格估算约 0.004482 美元；没有触发格式修复或规则降级。剩余 3 条失败均为行程请求漏选策略要求的 POI 或天气工具。该数据集已用于迭代评分规则，属于开发集，不代表开放域或未见数据上的效果。详见[评测说明](docs/evaluation.md)、[规则报告](evals/results/rule-baseline.json)和[DeepSeek 报告](evals/results/deepseek-flash.json)。
+开发集中的策略层补正了 2 个不完整行程计划，完整任务通过率由此前纯 LLM 的 85% 提升到 95%。冻结留出集在首次且唯一一次运行中达到 85%（17/20），无规则降级；使用 11,687 个输入 Token、951 个输出 Token，估算成本 0.004647 美元，端到端 P95 为 1,107 ms。留出集 SHA-256 为 `9063598c67fa0547f1adaf42a0f9f49d2770636aef0c45816da1b0640cfa30fc`，首次运行后没有据其结果修改 Prompt、策略或标注。详见[评测说明](docs/evaluation.md)、[开发集报告](evals/results/deepseek-flash-policy-dev.json)和[留出集报告](evals/results/deepseek-flash-holdout.json)。
 
 ## 当前架构
 
 ```text
 Request
   -> Understand
-  -> Plan
+  -> Plan (semantic LLM / rule fallback)
+  -> Enforce deterministic policy
   -> Execute tools
   -> Verify -- failed once --> Recover -> Execute
        |
@@ -105,10 +115,12 @@ Request
 - [x] 一次格式修复、工具白名单与规则降级
 - [x] 20 条规则/LLM 共用评测集
 - [x] DeepSeek 真实调用、成本与延迟对照
+- [x] 确定性业务策略层与可审计补正
+- [x] 20 条冻结留出集与数据集哈希
 - [ ] MCP Server：POI、天气、翻译
 - [ ] 混合 RAG、Rerank 和引用溯源
 - [ ] SSE 流式响应、会话记忆和人工确认
-- [ ] 50+ 条 Agent 评测集与指标看板
+- [ ] 多次重复评测、参数准确率与 50+ 条评测集
 - [ ] Docker Compose、CI 和在线演示
 
 ## 文档

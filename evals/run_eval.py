@@ -1,4 +1,5 @@
 import argparse
+import hashlib
 import json
 import os
 import time
@@ -21,9 +22,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--planner", choices=["rule", "llm"], default="rule")
     parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--cases",
+        type=Path,
+        default=Path(__file__).with_name("cases.jsonl"),
+    )
     args = parser.parse_args()
     planner = build_planner_from_env(args.planner)
-    case_path = Path(__file__).with_name("cases.jsonl")
+    case_path = args.cases
+    dataset_sha256 = hashlib.sha256(case_path.read_bytes()).hexdigest()
     cases = [
         json.loads(line)
         for line in case_path.read_text(encoding="utf-8").splitlines()
@@ -40,6 +47,8 @@ def main() -> None:
     completion_tokens = 0
     fallback_count = 0
     repaired_count = 0
+    policy_adjustment_count = 0
+    policy_adjusted_case_count = 0
     models: set[str] = set()
     details = []
     for case in cases:
@@ -72,6 +81,8 @@ def main() -> None:
         completion_tokens += response.trace.completion_tokens or 0
         fallback_count += int(response.trace.planner_used == "rule_fallback")
         repaired_count += int(response.trace.planner_repaired)
+        policy_adjustment_count += len(response.trace.policy_adjustments)
+        policy_adjusted_case_count += int(bool(response.trace.policy_adjustments))
         if response.trace.planner_model:
             models.add(response.trace.planner_model)
         details.append(
@@ -91,6 +102,7 @@ def main() -> None:
                 "end_to_end_latency_ms": end_to_end_ms,
                 "prompt_tokens": response.trace.prompt_tokens,
                 "completion_tokens": response.trace.completion_tokens,
+                "policy_adjustments": response.trace.policy_adjustments,
             }
         )
 
@@ -99,6 +111,10 @@ def main() -> None:
     estimated_cost = (prompt_tokens * input_rate + completion_tokens * output_rate) / 1_000_000
     report = {
         "scoring_policy": "intent-set_tool-set_constraints-v2",
+        "dataset": {
+            "path": str(case_path),
+            "sha256": dataset_sha256,
+        },
         "requested_planner": args.planner,
         "models": sorted(models),
         "cases": len(cases),
@@ -112,6 +128,8 @@ def main() -> None:
         ),
         "fallback_count": fallback_count,
         "repair_count": repaired_count,
+        "policy_adjustment_count": policy_adjustment_count,
+        "policy_adjusted_case_count": policy_adjusted_case_count,
         "planner_latency_ms": {
             "p50": percentile(planner_latencies, 0.50),
             "p95": percentile(planner_latencies, 0.95),
