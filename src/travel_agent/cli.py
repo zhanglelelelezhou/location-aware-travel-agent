@@ -16,7 +16,9 @@ def main() -> None:
     parser.add_argument("--preference", action="append", default=[])
     parser.add_argument("--target-language", default="ja")
     parser.add_argument("--planner", choices=["rule", "llm"], default="rule")
-    parser.add_argument("--tools", choices=["mock", "open-meteo"], default="mock")
+    parser.add_argument(
+        "--tools", choices=["mock", "open-meteo", "open-data"], default="mock"
+    )
     args = parser.parse_args()
 
     response = run_agent(

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from travel_agent.tools.poi import PoiItem, PoiSearchResult
 from travel_agent.tools.weather import WeatherObservation
 
 
@@ -12,24 +13,36 @@ class MockPoiSearchTool:
     def invoke(self, arguments: dict[str, Any]) -> dict[str, Any]:
         location = arguments.get("location") or "当前位置"
         preferences = arguments.get("preferences") or []
-        return {
-            "location": location,
-            "results": [
-                {
-                    "name": "Green Table Umeda",
-                    "category": "restaurant",
-                    "walking_minutes": 8,
-                    "supports": preferences or ["vegetarian options"],
-                    "source": "mock://poi/osaka/green-table-umeda",
-                },
-                {
-                    "name": "Osaka Station City",
-                    "category": "attraction",
-                    "walking_minutes": 2,
-                    "source": "mock://poi/osaka/station-city",
-                },
+        latitude = arguments.get("latitude")
+        longitude = arguments.get("longitude")
+        return PoiSearchResult(
+            location=location,
+            latitude=34.7025 if latitude is None else latitude,
+            longitude=135.4959 if longitude is None else longitude,
+            radius_m=arguments.get("radius_m") or 1500,
+            provider="mock",
+            attribution="mock data",
+            verified_preferences=preferences,
+            results=[
+                PoiItem(
+                    id="mock/green-table-umeda",
+                    name="Green Table Umeda",
+                    category="restaurant",
+                    distance_m=640,
+                    walking_minutes=8,
+                    supports=preferences or ["vegetarian options"],
+                    source="mock://poi/osaka/green-table-umeda",
+                ),
+                PoiItem(
+                    id="mock/osaka-station-city",
+                    name="Osaka Station City",
+                    category="attraction",
+                    distance_m=160,
+                    walking_minutes=2,
+                    source="mock://poi/osaka/station-city",
+                ),
             ],
-        }
+        ).model_dump()
 
 
 class MockWeatherTool:

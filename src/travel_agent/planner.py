@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from pydantic import BaseModel, Field, ValidationError
 
 from travel_agent.models import Intent, PlannedToolCall, PlanningDecision, TravelRequest
-from travel_agent.policy import enforce_travel_policy
+from travel_agent.policy import enforce_travel_policy, poi_categories_for_intents
 
 ALLOWED_TOOLS = {
     "search_poi",
@@ -82,6 +82,7 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
         "latitude": request.latitude,
         "longitude": request.longitude,
         "preferences": request.preferences,
+        "categories": poi_categories_for_intents(list(intents)),
     }
     normalized = request.text.lower()
     venue_discovery = any(

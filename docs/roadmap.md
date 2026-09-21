@@ -17,6 +17,7 @@
 - [x] DeepSeek 真实评测、Token/成本/延迟报告与错误分析
 - [x] 确定性业务策略层与独立留出评测集
 - [x] Open-Meteo 真实天气 adapter 与契约测试
+- [x] OpenStreetMap Overpass 真实 POI adapter、距离排序与证据过滤
 - POI、天气与翻译 MCP Server
 - 工具 schema 校验、超时、重试和降级
 - SSE 流式事件
