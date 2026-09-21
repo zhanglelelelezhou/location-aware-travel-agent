@@ -55,6 +55,7 @@ class AgentTrace(BaseModel):
     planner_repaired: bool = False
     planner_error: str | None = None
     planner_latency_ms: int = 0
+    planner_model: str | None = None
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
     missing_fields: list[str] = Field(default_factory=list)

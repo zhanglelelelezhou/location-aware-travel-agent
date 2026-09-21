@@ -33,3 +33,27 @@ python evals/run_eval.py --planner rule --output evals/results/rule-baseline.jso
 
 LLM Planner 已完成接口、结构化输出校验、一次修复和规则降级测试，但尚未使用真实模型跑完 20 条评测，因此当前不能宣称 LLM 已提高准确率。接入真实 Provider 后，需要同时报告成功率、P50/P95 延迟、Token 用量和调用成本。
 
+为防止降级结果掩盖模型问题，LLM 报告同时提供完整任务通过率、原生 LLM 通过率和 fallback_count。若模型输出失败后由规则版本答对，该样本不会计入原生 LLM 通过率。
+
+## 真实模型评测
+
+在项目根目录创建不提交 Git 的 `.env`：
+
+```dotenv
+AGENT_PLANNER=llm
+LLM_BASE_URL=https://your-provider.example/v1
+LLM_API_KEY=your-secret
+LLM_MODEL=your-model
+LLM_JSON_MODE=true
+LLM_INPUT_COST_PER_MILLION=0
+LLM_OUTPUT_COST_PER_MILLION=0
+```
+
+然后运行：
+
+```bash
+python evals/run_eval.py --planner llm --output evals/results/llm-candidate.json
+python evals/compare_reports.py evals/results/rule-baseline.json evals/results/llm-candidate.json
+```
+
+`LLM_JSON_MODE=false` 仅用于不支持 `response_format=json_object` 的兼容服务。价格字段只用于本地估算，应填写所用服务实际价格；为零时报告仍记录 Token，但估算成本为零。

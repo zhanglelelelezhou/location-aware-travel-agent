@@ -29,6 +29,7 @@ class AgentState(TypedDict, total=False):
     planner_repaired: bool
     planner_error: str | None
     planner_latency_ms: int
+    planner_model: str | None
     prompt_tokens: int | None
     completion_tokens: int | None
     missing_fields: list[str]
@@ -52,6 +53,7 @@ def _plan_with(planner: Planner):
             "planner_repaired": result.repaired,
             "planner_error": result.error,
             "planner_latency_ms": result.latency_ms,
+            "planner_model": result.model,
             "prompt_tokens": result.prompt_tokens,
             "completion_tokens": result.completion_tokens,
         }
@@ -143,6 +145,7 @@ def _respond(state: AgentState) -> dict[str, Any]:
             planner_repaired=state.get("planner_repaired", False),
             planner_error=state.get("planner_error"),
             planner_latency_ms=state.get("planner_latency_ms", 0),
+            planner_model=state.get("planner_model"),
             prompt_tokens=state.get("prompt_tokens"),
             completion_tokens=state.get("completion_tokens"),
             missing_fields=state.get("missing_fields", []),

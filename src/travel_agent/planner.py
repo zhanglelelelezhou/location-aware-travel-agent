@@ -6,6 +6,7 @@ import time
 from typing import Any, Literal, Protocol
 
 import httpx
+from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
 
 from travel_agent.models import Intent, PlannedToolCall, PlanningDecision, TravelRequest
@@ -24,6 +25,7 @@ class PlannerResult(BaseModel):
     repaired: bool = False
     error: str | None = None
     latency_ms: int = 0
+    model: str | None = None
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
 
@@ -35,6 +37,7 @@ class Planner(Protocol):
 class ProviderResult(BaseModel):
     payload: dict[str, Any]
     latency_ms: int = 0
+    model: str | None = None
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
 
@@ -123,11 +126,13 @@ class OpenAICompatibleProvider:
         api_key: str,
         model: str,
         timeout_seconds: float = 20.0,
+        json_mode: bool = True,
         client: httpx.Client | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
+        self.json_mode = json_mode
         self.client = client or httpx.Client(timeout=timeout_seconds)
 
     def generate_json(
@@ -148,15 +153,17 @@ class OpenAICompatibleProvider:
             messages.append({"role": "user", "content": repair_context})
 
         started = time.perf_counter()
+        request_body: dict[str, Any] = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": 0,
+        }
+        if self.json_mode:
+            request_body["response_format"] = {"type": "json_object"}
         response = self.client.post(
             f"{self.base_url}/chat/completions",
             headers={"Authorization": f"Bearer {self.api_key}"},
-            json={
-                "model": self.model,
-                "messages": messages,
-                "temperature": 0,
-                "response_format": {"type": "json_object"},
-            },
+            json=request_body,
         )
         response.raise_for_status()
         body = response.json()
@@ -166,6 +173,7 @@ class OpenAICompatibleProvider:
         return ProviderResult(
             payload=payload,
             latency_ms=round((time.perf_counter() - started) * 1000),
+            model=body.get("model") or self.model,
             prompt_tokens=usage.get("prompt_tokens"),
             completion_tokens=usage.get("completion_tokens"),
         )
@@ -217,6 +225,7 @@ class LLMPlanner:
         total_latency = 0
         prompt_tokens = 0
         completion_tokens = 0
+        model: str | None = None
 
         for attempt in range(2):
             repair_context = None
@@ -234,6 +243,7 @@ class LLMPlanner:
                 )
                 previous_payload = provider_result.payload
                 total_latency += provider_result.latency_ms
+                model = provider_result.model or model
                 prompt_tokens += provider_result.prompt_tokens or 0
                 completion_tokens += provider_result.completion_tokens or 0
                 decision = _validate_decision(provider_result.payload)
@@ -242,6 +252,7 @@ class LLMPlanner:
                     planner_used="llm",
                     repaired=attempt == 1,
                     latency_ms=total_latency,
+                    model=model,
                     prompt_tokens=prompt_tokens or None,
                     completion_tokens=completion_tokens or None,
                 )
@@ -265,6 +276,7 @@ class LLMPlanner:
                 "repaired": previous_payload is not None,
                 "error": last_error,
                 "latency_ms": total_latency,
+                "model": model,
                 "prompt_tokens": prompt_tokens or None,
                 "completion_tokens": completion_tokens or None,
             }
@@ -272,6 +284,7 @@ class LLMPlanner:
 
 
 def build_planner_from_env(kind: str | None = None) -> Planner:
+    load_dotenv()
     selected = (kind or os.getenv("AGENT_PLANNER", "rule")).lower()
     if selected == "rule":
         return RulePlanner()
@@ -290,5 +303,6 @@ def build_planner_from_env(kind: str | None = None) -> Planner:
         base_url=required["LLM_BASE_URL"] or "",
         api_key=required["LLM_API_KEY"] or "",
         model=required["LLM_MODEL"] or "",
+        json_mode=os.getenv("LLM_JSON_MODE", "true").lower() not in {"0", "false", "no"},
     )
     return LLMPlanner(provider)
