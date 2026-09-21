@@ -32,6 +32,7 @@ class AgentState(TypedDict, total=False):
     planner_model: str | None
     prompt_tokens: int | None
     completion_tokens: int | None
+    policy_adjustments: list[str]
     missing_fields: list[str]
     needs_confirmation: bool
 
@@ -56,6 +57,7 @@ def _plan_with(planner: Planner):
             "planner_model": result.model,
             "prompt_tokens": result.prompt_tokens,
             "completion_tokens": result.completion_tokens,
+            "policy_adjustments": result.policy_adjustments,
         }
 
     return plan
@@ -148,6 +150,7 @@ def _respond(state: AgentState) -> dict[str, Any]:
             planner_model=state.get("planner_model"),
             prompt_tokens=state.get("prompt_tokens"),
             completion_tokens=state.get("completion_tokens"),
+            policy_adjustments=state.get("policy_adjustments", []),
             missing_fields=state.get("missing_fields", []),
             needs_confirmation=state.get("needs_confirmation", False),
         ),

@@ -1,0 +1,470 @@
+{
+  "scoring_policy": "intent-set_tool-set_constraints-v2",
+  "dataset": {
+    "path": "evals/cases.jsonl",
+    "sha256": "957f17e90bdbd7363ed9fe844439125f091824415d0e2d7e96a8dd3f809c2581"
+  },
+  "requested_planner": "rule",
+  "models": [],
+  "cases": 20,
+  "passed": 11,
+  "task_pass_rate": 0.55,
+  "intent_accuracy": 0.55,
+  "tool_accuracy": 0.8,
+  "constraint_accuracy": 0.95,
+  "native_llm_task_pass_rate": null,
+  "fallback_count": 0,
+  "repair_count": 0,
+  "policy_adjustment_count": 0,
+  "policy_adjusted_case_count": 0,
+  "planner_latency_ms": {
+    "p50": 0,
+    "p95": 0
+  },
+  "end_to_end_latency_ms": {
+    "p50": 6,
+    "p95": 8
+  },
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "pricing_per_million_tokens": {
+      "input": 0.3,
+      "output": 1.2
+    }
+  },
+  "details": [
+    {
+      "id": "dining_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "translation"
+      ],
+      "tools": [
+        "search_poi",
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 9,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "itinerary_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "safety_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "safety"
+      ],
+      "tools": [
+        "search_travel_knowledge"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "translation_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "translation"
+      ],
+      "tools": [
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "general_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "weather_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "weather"
+      ],
+      "tools": [
+        "get_weather"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "booking_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": true,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "missing_location_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [
+        "location"
+      ],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "dining_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [
+        "search_poi"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "itinerary_en_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 8,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "safety_en_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "safety"
+      ],
+      "tools": [
+        "search_travel_knowledge"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 8,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "multi_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary",
+        "translation"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather",
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "semantic_dining_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "semantic_itinerary_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "semantic_translation_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": false,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "semantic_safety_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "injection_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "unsupported_currency_001",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "semantic_weather_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "booking_en_001",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining",
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": true,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    }
+  ]
+}

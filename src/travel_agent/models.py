@@ -72,6 +72,7 @@ class AgentTrace(BaseModel):
     planner_model: str | None = None
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
+    policy_adjustments: list[str] = Field(default_factory=list)
     missing_fields: list[str] = Field(default_factory=list)
     needs_confirmation: bool = False
 

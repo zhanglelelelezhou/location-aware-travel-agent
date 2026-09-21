@@ -1,0 +1,454 @@
+{
+  "scoring_policy": "intent-set_tool-set_constraints-v2",
+  "dataset": {
+    "path": "evals/holdout_cases.jsonl",
+    "sha256": "9063598c67fa0547f1adaf42a0f9f49d2770636aef0c45816da1b0640cfa30fc"
+  },
+  "requested_planner": "rule",
+  "models": [],
+  "cases": 20,
+  "passed": 10,
+  "task_pass_rate": 0.5,
+  "intent_accuracy": 0.6,
+  "tool_accuracy": 0.55,
+  "constraint_accuracy": 0.9,
+  "native_llm_task_pass_rate": null,
+  "fallback_count": 0,
+  "repair_count": 0,
+  "policy_adjustment_count": 0,
+  "policy_adjusted_case_count": 0,
+  "planner_latency_ms": {
+    "p50": 0,
+    "p95": 0
+  },
+  "end_to_end_latency_ms": {
+    "p50": 6,
+    "p95": 7
+  },
+  "usage": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "pricing_per_million_tokens": {
+      "input": 0.3,
+      "output": 1.2
+    }
+  },
+  "details": [
+    {
+      "id": "holdout_dining_cn",
+      "passed": false,
+      "intent_ok": true,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 9,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_itinerary_cn",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_weather_cn",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_translation_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "translation"
+      ],
+      "tools": [
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_safety_cn",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_booking_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": true,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_missing_dining_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "dining"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [
+        "location"
+      ],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_general_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_injection_en",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_itinerary_en",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_dining_en",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_weather_en",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "weather"
+      ],
+      "tools": [
+        "get_weather"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_translation_en",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "translation"
+      ],
+      "tools": [
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_safety_en",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_booking_en",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "booking"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": true,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_multi_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "itinerary",
+        "translation"
+      ],
+      "tools": [
+        "search_poi",
+        "get_weather",
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_missing_weather_cn",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": true,
+      "constraint_ok": false,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_missing_translation_cn",
+      "passed": false,
+      "intent_ok": true,
+      "tool_ok": false,
+      "constraint_ok": false,
+      "intents": [
+        "translation"
+      ],
+      "tools": [
+        "translate_phrase"
+      ],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_unsupported_cn",
+      "passed": true,
+      "intent_ok": true,
+      "tool_ok": true,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 6,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    },
+    {
+      "id": "holdout_safety_general_cn",
+      "passed": false,
+      "intent_ok": false,
+      "tool_ok": false,
+      "constraint_ok": true,
+      "intents": [
+        "general"
+      ],
+      "tools": [],
+      "planner_used": "rule",
+      "planner_repaired": false,
+      "missing_fields": [],
+      "needs_confirmation": false,
+      "planner_latency_ms": 0,
+      "end_to_end_latency_ms": 7,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "policy_adjustments": []
+    }
+  ]
+}

@@ -74,6 +74,29 @@ def test_agent_can_use_llm_planner_for_semantic_request() -> None:
     assert "Green Table Umeda" in response.answer
 
 
+def test_policy_adjustments_are_visible_in_agent_trace() -> None:
+    class IncompleteItineraryProvider:
+        def generate_json(self, **_: object) -> ProviderResult:
+            return ProviderResult(
+                payload={
+                    "intents": ["itinerary"],
+                    "missing_fields": [],
+                    "tool_calls": [],
+                    "needs_confirmation": False,
+                }
+            )
+
+    response = run_agent(
+        TravelRequest(text="给我排个京都半日游", location="京都"),
+        planner=LLMPlanner(IncompleteItineraryProvider()),
+    )
+
+    assert response.trace.policy_adjustments == [
+        "itinerary:add_search_poi",
+        "itinerary:add_get_weather",
+    ]
+
+
 def test_missing_location_stops_before_tool_execution() -> None:
     response = run_agent(TravelRequest(text="附近有什么素食餐厅", preferences=["素食"]))
 

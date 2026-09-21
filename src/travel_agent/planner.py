@@ -7,9 +7,10 @@ from typing import Any, Literal, Protocol, cast
 
 import httpx
 from dotenv import load_dotenv
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
 from travel_agent.models import Intent, PlannedToolCall, PlanningDecision, TravelRequest
+from travel_agent.policy import enforce_travel_policy
 
 ALLOWED_TOOLS = {
     "search_poi",
@@ -28,6 +29,7 @@ class PlannerResult(BaseModel):
     model: str | None = None
     prompt_tokens: int | None = None
     completion_tokens: int | None = None
+    policy_adjustments: list[str] = Field(default_factory=list)
 
 
 class Planner(Protocol):
@@ -281,14 +283,16 @@ class LLMPlanner:
                 prompt_tokens += provider_result.prompt_tokens or 0
                 completion_tokens += provider_result.completion_tokens or 0
                 decision = _validate_decision(provider_result.payload)
+                policy_outcome = enforce_travel_policy(decision, request)
                 return PlannerResult(
-                    decision=decision,
+                    decision=policy_outcome.decision,
                     planner_used="llm",
                     repaired=attempt == 1,
                     latency_ms=total_latency,
                     model=model,
                     prompt_tokens=prompt_tokens or None,
                     completion_tokens=completion_tokens or None,
+                    policy_adjustments=policy_outcome.adjustments,
                 )
             except (
                 ValidationError,
