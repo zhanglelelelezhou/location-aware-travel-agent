@@ -69,16 +69,17 @@ python evals/compare_reports.py \
 
 ## 当前可复现实验结果
 
-20 条固定用例上的规则 Planner 基线：
+20 条开发期固定用例上的规则 Planner 与 `deepseek-flash` 单次对照：
 
-| 指标 | 结果 |
-| --- | ---: |
-| 完整任务通过率 | 75%（15/20） |
-| 意图准确率 | 75% |
-| 工具路径准确率 | 75% |
-| 缺失信息与确认约束准确率 | 100% |
+| 指标 | 规则 Planner | DeepSeek | 变化 |
+| --- | ---: | ---: | ---: |
+| 完整任务通过率 | 55% | 85% | +30 pp |
+| 意图准确率 | 55% | 100% | +45 pp |
+| 工具集合准确率 | 80% | 85% | +5 pp |
+| 缺失信息与确认约束准确率 | 95% | 100% | +5 pp |
+| 端到端 P95 延迟 | 7 ms | 949 ms | +942 ms |
 
-5 条失败均为关键词未覆盖的语义改写场景。该结果用于衡量真实 LLM Planner 是否带来足以覆盖延迟和 Token 成本的收益，不代表开放域总体效果。详见[评测说明](docs/evaluation.md)和[原始报告](evals/results/rule-baseline.json)。
+DeepSeek 本轮使用 10,957 个输入 Token、996 个输出 Token，按配置的保守价格估算约 0.004482 美元；没有触发格式修复或规则降级。剩余 3 条失败均为行程请求漏选策略要求的 POI 或天气工具。该数据集已用于迭代评分规则，属于开发集，不代表开放域或未见数据上的效果。详见[评测说明](docs/evaluation.md)、[规则报告](evals/results/rule-baseline.json)和[DeepSeek 报告](evals/results/deepseek-flash.json)。
 
 ## 当前架构
 
@@ -103,6 +104,7 @@ Request
 - [x] LLM Provider 抽象与结构化输出
 - [x] 一次格式修复、工具白名单与规则降级
 - [x] 20 条规则/LLM 共用评测集
+- [x] DeepSeek 真实调用、成本与延迟对照
 - [ ] MCP Server：POI、天气、翻译
 - [ ] 混合 RAG、Rerank 和引用溯源
 - [ ] SSE 流式响应、会话记忆和人工确认

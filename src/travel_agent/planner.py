@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import os
 import time
-from typing import Any, Literal, Protocol
+from typing import Any, Literal, Protocol, cast
 
 import httpx
 from dotenv import load_dotenv
@@ -56,7 +56,10 @@ def detect_intents(text: str) -> list[Intent]:
     normalized = text.lower()
     detected: list[Intent] = []
     keyword_groups: list[tuple[Intent, tuple[str, ...]]] = [
-        ("dining", ("餐厅", "吃", "点餐", "素食", "restaurant", "food")),
+        (
+            "dining",
+            ("餐厅", "吃", "点餐", "餐位", "素食", "restaurant", "food", "dish", "table"),
+        ),
         ("itinerary", ("行程", "景点", "安排", "路线", "itinerary")),
         ("translation", ("翻译", "日语", "怎么说", "translate")),
         ("safety", ("过敏", "禁忌", "风险", "allergy", "safe")),
@@ -73,29 +76,34 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
     intents = detect_intents(request.text)
     calls: list[PlannedToolCall] = []
     common = {"location": request.location, "preferences": request.preferences}
-    if "dining" in intents or "itinerary" in intents:
-        calls.append(PlannedToolCall(name="search_poi", arguments=common))
-    if "itinerary" in intents or "weather" in intents:
-        calls.append(
-            PlannedToolCall(name="get_weather", arguments={"location": request.location})
-        )
-    if "safety" in intents:
-        calls.append(
-            PlannedToolCall(
-                name="search_travel_knowledge", arguments={"query": request.text}
+    normalized = request.text.lower()
+    venue_discovery = any(
+        keyword in normalized for keyword in ("餐厅", "附近", "周围", "restaurant", "nearby", "店")
+    )
+    if "booking" not in intents:
+        if ("dining" in intents and venue_discovery) or "itinerary" in intents:
+            calls.append(PlannedToolCall(name="search_poi", arguments=common))
+        if "itinerary" in intents or "weather" in intents:
+            calls.append(
+                PlannedToolCall(name="get_weather", arguments={"location": request.location})
             )
-        )
-    if "translation" in intents or "dining" in intents:
-        calls.append(
-            PlannedToolCall(
-                name="translate_phrase",
-                arguments={
-                    "text": request.text,
-                    "target_language": request.target_language,
-                    "preferences": request.preferences,
-                },
+        if "safety" in intents:
+            calls.append(
+                PlannedToolCall(
+                    name="search_travel_knowledge", arguments={"query": request.text}
+                )
             )
-        )
+        if "translation" in intents:
+            calls.append(
+                PlannedToolCall(
+                    name="translate_phrase",
+                    arguments={
+                        "text": request.text,
+                        "target_language": request.target_language,
+                        "preferences": request.preferences,
+                    },
+                )
+            )
 
     location_tools = {"search_poi", "get_weather"}
     missing_fields = (
@@ -103,11 +111,13 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
         if not request.location and any(call.name in location_tools for call in calls)
         else []
     )
+    if missing_fields:
+        calls = []
     return PlanningDecision(
         intents=intents,
         missing_fields=missing_fields,
         tool_calls=calls,
-        needs_confirmation=bool(missing_fields) or "booking" in intents,
+        needs_confirmation="booking" in intents,
     )
 
 
@@ -127,12 +137,16 @@ class OpenAICompatibleProvider:
         model: str,
         timeout_seconds: float = 20.0,
         json_mode: bool = True,
+        thinking_mode: Literal["enabled", "disabled"] | None = None,
+        max_tokens: int = 1500,
         client: httpx.Client | None = None,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.json_mode = json_mode
+        self.thinking_mode = thinking_mode
+        self.max_tokens = max_tokens
         self.client = client or httpx.Client(timeout=timeout_seconds)
 
     def generate_json(
@@ -157,9 +171,12 @@ class OpenAICompatibleProvider:
             "model": self.model,
             "messages": messages,
             "temperature": 0,
+            "max_tokens": self.max_tokens,
         }
         if self.json_mode:
             request_body["response_format"] = {"type": "json_object"}
+        if self.thinking_mode:
+            request_body["thinking"] = {"type": self.thinking_mode}
         response = self.client.post(
             f"{self.base_url}/chat/completions",
             headers={"Authorization": f"Bearer {self.api_key}"},
@@ -179,9 +196,11 @@ class OpenAICompatibleProvider:
         )
 
 
-def _parse_json_content(content: str | dict[str, Any]) -> dict[str, Any]:
+def _parse_json_content(content: str | dict[str, Any] | None) -> dict[str, Any]:
     if isinstance(content, dict):
         return content
+    if not content or not content.strip():
+        raise ValueError("Planner returned empty content.")
     stripped = content.strip()
     if stripped.startswith("```"):
         lines = stripped.splitlines()
@@ -194,13 +213,28 @@ def _parse_json_content(content: str | dict[str, Any]) -> dict[str, Any]:
 
 def _system_prompt() -> str:
     schema = json.dumps(PlanningDecision.model_json_schema(), ensure_ascii=False)
+    example = {
+        "intents": ["weather"],
+        "missing_fields": [],
+        "tool_calls": [
+            {"name": "get_weather", "arguments": {"location": "Tokyo"}}
+        ],
+        "needs_confirmation": False,
+    }
     return (
         "You are the planner for a location-aware travel agent. "
-        "Return one JSON object only, matching the supplied schema. "
-        "Use only these tools: search_poi, get_weather, translate_phrase, "
-        "search_travel_knowledge. Never invent a tool. Mark missing required "
-        "information in missing_fields. Booking or payment requests require "
-        "needs_confirmation=true and must not create an unsupported tool call. "
+        "Return one JSON object only, matching the supplied JSON schema. "
+        "Follow this policy exactly: search_poi is for explicit venue or attraction "
+        "discovery; get_weather is required for weather questions and itinerary planning; "
+        "translate_phrase is used only when translation or phrase generation is explicitly "
+        "requested; search_travel_knowledge is required for allergy or travel-safety advice. "
+        "Greetings and unsupported currency conversion are general intent with no tools. "
+        "If a required location or translation source text is missing, use only the canonical "
+        "field name location or text in missing_fields and return no tool calls. "
+        "needs_confirmation is only for side-effect "
+        "requests such as booking or payment. Booking requests must set it true and must not "
+        "create an unsupported tool call. Use each tool at most once. Never invent a tool. "
+        f"Example JSON output: {json.dumps(example, ensure_ascii=False)}. "
         f"JSON schema: {schema}"
     )
 
@@ -304,5 +338,19 @@ def build_planner_from_env(kind: str | None = None) -> Planner:
         api_key=required["LLM_API_KEY"] or "",
         model=required["LLM_MODEL"] or "",
         json_mode=os.getenv("LLM_JSON_MODE", "true").lower() not in {"0", "false", "no"},
+        thinking_mode=_thinking_mode_from_env(required["LLM_BASE_URL"] or ""),
+        max_tokens=int(os.getenv("LLM_MAX_TOKENS", "1500")),
     )
     return LLMPlanner(provider)
+
+
+def _thinking_mode_from_env(base_url: str) -> Literal["enabled", "disabled"] | None:
+    configured = os.getenv("LLM_THINKING_MODE")
+    if configured:
+        normalized = configured.lower()
+        if normalized not in {"enabled", "disabled"}:
+            raise ValueError("LLM_THINKING_MODE must be enabled or disabled")
+        return cast(Literal["enabled", "disabled"], normalized)
+    if "api.deepseek.com" in base_url.lower():
+        return "disabled"
+    return None
