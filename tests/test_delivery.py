@@ -8,6 +8,15 @@ import yaml
 ROOT = Path(__file__).parents[1]
 
 
+def test_repository_declares_mit_license() -> None:
+    license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+    project_metadata = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert license_text.startswith("MIT License")
+    assert "Copyright (c) 2026 张文乐" in license_text
+    assert 'license = {file = "LICENSE"}' in project_metadata
+
+
 def test_dockerfile_runs_non_root_with_healthcheck() -> None:
     dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
 
