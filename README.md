@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client 执行链路、规则降级和冻结评测集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client 执行链路、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -120,6 +120,19 @@ python evals/run_knowledge_eval.py \
 
 当前 12 条中英文小型基线为 Hit@1 100%、Hit@3 100%、Recall@3 95.8%、MRR@3 100%；另有 6 条库外查询，拒答准确率 100%。语料与两组查询集都记录 SHA-256；这些数字只用于后续稠密检索和 Rerank 的同集对照，不代表开放域泛化能力。详见[知识检索设计](docs/knowledge-retrieval.md)。
 
+可选安装 FastEmbed 并运行稠密/混合检索：
+
+```bash
+python -m pip install -e ".[dev,rag]"
+python evals/run_knowledge_eval.py \
+  --cases evals/knowledge_blind_cases.jsonl \
+  --rejection-cases evals/knowledge_blind_rejection_cases.jsonl \
+  --retrieval-method hybrid \
+  --dense-min-score 0.60
+```
+
+冻结盲测揭示了更真实的上限：BM25 的 Hit@1/Hit@3 为 58.3%/66.7%，稠密检索为 25.0%/25.0%，RRF 混合为 66.7%/66.7%；三者的库外拒答准确率分别为 62.5%、87.5%、62.5%。因此线上默认没有切换到混合检索。模型缓存位于 Git 忽略的 `.cache/fastembed`，可通过 `KNOWLEDGE_RETRIEVAL=dense|hybrid` 显式启用实验方案。
+
 启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
 ```bash
@@ -200,7 +213,8 @@ Request
 - [x] MCP Client：Agent 工具执行、会话复用与错误归一化
 - [x] 官方来源知识快照、BM25 基线、引用输出与检索评测
 - [ ] MCP Server：翻译与旅行知识
-- [ ] 稠密检索、混合召回与 Rerank 对照实验
+- [x] 多语稠密检索与 RRF 混合召回盲测消融（负结果如实保留）
+- [ ] Rerank、按主题校准拒答和更大规模盲测
 - [ ] SSE 流式响应、会话记忆和人工确认
 - [ ] 多次重复评测、参数准确率与 50+ 条评测集
 - [ ] Docker Compose、CI 和在线演示

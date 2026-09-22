@@ -1,0 +1,211 @@
+{
+  "retrieval_method": "dense",
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "embedding_backend": "fastembed",
+  "embedding_backend_version": "0.8.0",
+  "bm25_minimum_score": 1.0,
+  "dense_minimum_score": 0.6,
+  "initialization_ms": 1940.041,
+  "query_latency_ms": {
+    "p50": 19.126,
+    "p95": 35.922
+  },
+  "cases_path": "evals/knowledge_blind_cases.jsonl",
+  "cases_sha256": "8f73fce0f867071c109f746fe49b63149f083b1e772bc06085b9fe09be2381c1",
+  "rejection_cases_path": "evals/knowledge_blind_rejection_cases.jsonl",
+  "rejection_cases_sha256": "8adaf3c9079fbb5467c64b69730bc84d80e15480b3e867f8d18aa18f7246a546",
+  "corpus_path": "src/travel_agent/data/knowledge/japan_travel_safety.json",
+  "corpus_sha256": "eb14d9f3ebd73012ba2c475b39c1cd0ed3a47eddef36af76a49d698fac89f10e",
+  "case_count": 12,
+  "top_k": 3,
+  "hit_at_1": 0.25,
+  "hit_at_k": 0.25,
+  "recall_at_k": 0.25,
+  "mrr_at_k": 0.25,
+  "rejection_case_count": 8,
+  "rejection_accuracy": 0.875,
+  "cases": [
+    {
+      "id": "blind_allergy_shared_kitchen_cn",
+      "retrieved_ids": [
+        "jp-restaurant-allergy-cross-contact"
+      ],
+      "relevant_ids": [
+        "jp-restaurant-allergy-cross-contact"
+      ],
+      "hit_at_1": true,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "first_relevant_rank": 1
+    },
+    {
+      "id": "blind_allergy_shared_kitchen_en",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-restaurant-allergy-cross-contact"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_allergy_card_cn",
+      "retrieved_ids": [
+        "jp-food-allergy-communication"
+      ],
+      "relevant_ids": [
+        "jp-food-allergy-communication"
+      ],
+      "hit_at_1": true,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "first_relevant_rank": 1
+    },
+    {
+      "id": "blind_allergy_card_en",
+      "retrieved_ids": [
+        "jp-food-allergy-communication"
+      ],
+      "relevant_ids": [
+        "jp-food-allergy-communication"
+      ],
+      "hit_at_1": true,
+      "hit_at_k": true,
+      "recall_at_k": 1.0,
+      "first_relevant_rank": 1
+    },
+    {
+      "id": "blind_police_cn",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-emergency-numbers"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_hotline_en",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-emergency-numbers"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_earthquake_cn",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-earthquake-actions"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_earthquake_en",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-earthquake-actions"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_passport_cn",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-lost-passport-police-report"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_passport_en",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-lost-passport-police-report"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_medical_cn",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-medical-assistance"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    },
+    {
+      "id": "blind_medical_en",
+      "retrieved_ids": [],
+      "relevant_ids": [
+        "jp-medical-assistance"
+      ],
+      "hit_at_1": false,
+      "hit_at_k": false,
+      "recall_at_k": 0.0,
+      "first_relevant_rank": null
+    }
+  ],
+  "rejection_cases": [
+    {
+      "id": "blind_ood_child_seat_cn",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_typhoon_flight_cn",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_hiking_cn",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_voltage_cn",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_rail_pass_en",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_tax_free_en",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_driving_en",
+      "retrieved_ids": [],
+      "correctly_rejected": true
+    },
+    {
+      "id": "blind_ood_food_compensation_cn",
+      "retrieved_ids": [
+        "jp-restaurant-allergy-cross-contact"
+      ],
+      "correctly_rejected": false
+    }
+  ]
+}

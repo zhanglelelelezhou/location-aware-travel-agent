@@ -1,0 +1,12 @@
+{"id":"blind_allergy_shared_kitchen_cn","query":"后厨如果共用锅和夹子，我该怎样判断这顿饭对严重过敏者是否安全？","relevant_ids":["jp-restaurant-allergy-cross-contact"]}
+{"id":"blind_allergy_shared_kitchen_en","query":"A dish lists no nuts, but could shared kitchen equipment still make it unsafe?","relevant_ids":["jp-restaurant-allergy-cross-contact"]}
+{"id":"blind_allergy_card_cn","query":"看不懂包装上的日文，怎样把不能吃的东西清楚展示给店员？","relevant_ids":["jp-food-allergy-communication"]}
+{"id":"blind_allergy_card_en","query":"Is there a printable card to show my allergens when I cannot read Japanese packaging?","relevant_ids":["jp-food-allergy-communication"]}
+{"id":"blind_police_cn","query":"遭遇人身威胁时该拨哪个三位数号码，而不是叫救护车？","relevant_ids":["jp-emergency-numbers"]}
+{"id":"blind_hotline_en","query":"Who can a Mandarin-speaking tourist call around the clock after an accident?","relevant_ids":["jp-emergency-numbers"]}
+{"id":"blind_earthquake_cn","query":"房间突然摇得很厉害，震动结束后还要防范哪些危险？","relevant_ids":["jp-earthquake-actions"]}
+{"id":"blind_earthquake_en","query":"The building starts shaking near the coast; what are my first steps?","relevant_ids":["jp-earthquake-actions"]}
+{"id":"blind_passport_cn","query":"钱包和旅行证件一起被偷，办新证件前需要从当地部门拿什么证明？","relevant_ids":["jp-lost-passport-police-report"]}
+{"id":"blind_passport_en","query":"My travel document was stolen. What local paperwork is needed before replacement?","relevant_ids":["jp-lost-passport-police-report"]}
+{"id":"blind_medical_cn","query":"身体不舒服但没有生命危险，哪里能获得中文就医协助？","relevant_ids":["jp-medical-assistance"]}
+{"id":"blind_medical_en","query":"My companion needs a clinic and does not speak Japanese. Where can we get multilingual help?","relevant_ids":["jp-medical-assistance"]}
