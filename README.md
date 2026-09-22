@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI 工具、MCP Server/Client 执行链路、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client 执行链路、规则降级和冻结评测集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -54,7 +54,7 @@ travel-agent "东京现在天气怎么样" \
   --tools open-meteo
 ```
 
-服务模式可在 `.env` 中设置 `AGENT_PROVIDER=open-meteo`。当前只有天气为真实服务，POI、翻译和知识工具仍使用 Mock；文本地名仅作为回退，候选不唯一时会明确失败并要求坐标。
+服务模式可在 `.env` 中设置 `AGENT_PROVIDER=open-meteo`。该模式使用真实天气、官方来源知识快照以及 Mock POI/翻译；文本地名仅作为回退，候选不唯一时会明确失败并要求坐标。
 
 同时启用真实天气和 POI 搜索：
 
@@ -101,7 +101,24 @@ travel-agent "帮我安排东京半日景点行程" \
   --tools mcp
 ```
 
-完全离线验证可设置 `MCP_SERVER_PROVIDER=mock`。连接已启动的 Streamable HTTP server 时设置 `MCP_SERVER_URL=http://127.0.0.1:8001/mcp`。当前只有天气与 POI 经过 MCP；翻译与旅行知识仍使用本地 Mock。
+完全离线验证可设置 `MCP_SERVER_PROVIDER=mock`。连接已启动的 Streamable HTTP server 时设置 `MCP_SERVER_URL=http://127.0.0.1:8001/mcp`。当前只有天气与 POI 经过 MCP；翻译在本地使用 Mock，旅行知识在本地使用官方来源快照。
+
+## 带引用的旅行知识检索
+
+真实工具模式包含一个可复现的中英文 BM25 基线，语料是对日本消费者厅和日本政府观光局页面的短摘要，每个 passage 保留发布机构、原始 URL、主题和快照日期。安全问题的回答会直接附上来源链接：
+
+```bash
+travel-agent "我对花生严重过敏，在日本餐厅点餐要注意什么" --tools open-data
+```
+
+运行独立检索评测：
+
+```bash
+python evals/run_knowledge_eval.py \
+  --output evals/results/knowledge-bm25-baseline.json
+```
+
+当前 12 条中英文小型基线为 Hit@1 100%、Hit@3 100%、Recall@3 95.8%、MRR@3 100%；另有 6 条库外查询，拒答准确率 100%。语料与两组查询集都记录 SHA-256；这些数字只用于后续稠密检索和 Rerank 的同集对照，不代表开放域泛化能力。详见[知识检索设计](docs/knowledge-retrieval.md)。
 
 启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
@@ -156,7 +173,7 @@ Request
   -> Understand
   -> Plan (semantic LLM / rule fallback)
   -> Enforce deterministic policy
-  -> Execute tools (Mock / Open-Meteo / OpenStreetMap Overpass)
+  -> Execute tools (Mock / Open-Meteo / OpenStreetMap / cited knowledge / MCP)
   -> Verify -- failed once --> Recover -> Execute
        |
        +-- success / retry exhausted --> Respond
@@ -181,8 +198,9 @@ Request
 - [x] OpenStreetMap 真实 POI、距离排序与偏好证据过滤
 - [x] MCP Server：天气与 POI、stdio 与 Streamable HTTP
 - [x] MCP Client：Agent 工具执行、会话复用与错误归一化
+- [x] 官方来源知识快照、BM25 基线、引用输出与检索评测
 - [ ] MCP Server：翻译与旅行知识
-- [ ] 混合 RAG、Rerank 和引用溯源
+- [ ] 稠密检索、混合召回与 Rerank 对照实验
 - [ ] SSE 流式响应、会话记忆和人工确认
 - [ ] 多次重复评测、参数准确率与 50+ 条评测集
 - [ ] Docker Compose、CI 和在线演示
@@ -191,6 +209,7 @@ Request
 
 - [架构与边界](docs/architecture.md)
 - [工具契约](docs/tool-contracts.md)
+- [知识检索设计](docs/knowledge-retrieval.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)

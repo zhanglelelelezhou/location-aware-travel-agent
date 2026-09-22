@@ -1,0 +1,12 @@
+{"id":"allergy_restaurant_cn","query":"我对花生严重过敏，在日本餐厅点餐要确认什么？","relevant_ids":["jp-restaurant-allergy-cross-contact"]}
+{"id":"allergy_card_cn","query":"有没有给日本店员看的中文食物过敏沟通卡？","relevant_ids":["jp-food-allergy-communication"]}
+{"id":"allergy_label_en","query":"Are food labels in Japan available in English for allergy sufferers?","relevant_ids":["jp-food-allergy-communication"]}
+{"id":"emergency_police_cn","query":"在日本遇到紧急警务事件报警电话是多少？","relevant_ids":["jp-emergency-numbers"]}
+{"id":"emergency_ambulance_en","query":"What number should I call for an ambulance in Japan?","relevant_ids":["jp-emergency-numbers","jp-medical-assistance"]}
+{"id":"earthquake_cn","query":"在日本旅行遇到地震应该怎么做？","relevant_ids":["jp-earthquake-actions"]}
+{"id":"earthquake_en","query":"What should a traveler do during an earthquake and aftershocks?","relevant_ids":["jp-earthquake-actions"]}
+{"id":"lost_passport_cn","query":"护照在东京丢了，报案和补办需要怎么处理？","relevant_ids":["jp-lost-passport-police-report"]}
+{"id":"lost_passport_en","query":"I lost my passport in Japan. Do I need a police report and embassy?","relevant_ids":["jp-lost-passport-police-report"]}
+{"id":"medical_help_cn","query":"游客在日本生病了，如何寻找医院或中文求助？","relevant_ids":["jp-medical-assistance"]}
+{"id":"visitor_hotline_en","query":"Is there a 24 hour multilingual visitor hotline for illness?","relevant_ids":["jp-medical-assistance","jp-emergency-numbers"]}
+{"id":"cross_contact_en","query":"How do I ask a Japanese restaurant about cross contact and ingredients?","relevant_ids":["jp-restaurant-allergy-cross-contact"]}

@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from travel_agent.tools.base import ToolRegistry
+from travel_agent.tools.knowledge import LocalTravelKnowledgeTool
 from travel_agent.tools.mcp import build_mcp_registry
 from travel_agent.tools.mock import (
     MockPoiSearchTool,
@@ -48,7 +49,7 @@ def build_tool_registry_from_env(kind: str | None = None) -> ToolRegistry:
                 timeout_seconds=float(os.getenv("WEATHER_TIMEOUT_SECONDS", "8"))
             ),
             MockTranslateTool(),
-            MockTravelKnowledgeTool(),
+            LocalTravelKnowledgeTool(),
         ],
         provider=selected,
     )
