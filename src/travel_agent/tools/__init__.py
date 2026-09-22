@@ -3,6 +3,7 @@ import os
 from dotenv import load_dotenv
 
 from travel_agent.tools.base import ToolRegistry
+from travel_agent.tools.mcp import build_mcp_registry
 from travel_agent.tools.mock import (
     MockPoiSearchTool,
     MockTranslateTool,
@@ -30,6 +31,8 @@ def build_tool_registry_from_env(kind: str | None = None) -> ToolRegistry:
     selected = (kind or os.getenv("AGENT_PROVIDER", "mock")).lower()
     if selected == "mock":
         return build_mock_registry()
+    if selected == "mcp":
+        return build_mcp_registry()
     if selected not in {"open-meteo", "open-data"}:
         raise ValueError(f"Unsupported tool provider: {selected}")
     return ToolRegistry(
@@ -51,4 +54,9 @@ def build_tool_registry_from_env(kind: str | None = None) -> ToolRegistry:
     )
 
 
-__all__ = ["ToolRegistry", "build_mock_registry", "build_tool_registry_from_env"]
+__all__ = [
+    "ToolRegistry",
+    "build_mcp_registry",
+    "build_mock_registry",
+    "build_tool_registry_from_env",
+]

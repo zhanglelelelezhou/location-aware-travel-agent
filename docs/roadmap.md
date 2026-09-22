@@ -19,6 +19,7 @@
 - [x] Open-Meteo 真实天气 adapter 与契约测试
 - [x] OpenStreetMap Overpass 真实 POI adapter、距离排序与证据过滤
 - [x] POI 与天气 MCP Server（stdio、Streamable HTTP、协议级测试）
+- [x] LangGraph MCP Client 执行路径、计划级会话复用与错误归一化
 - 翻译与旅行知识 MCP Server
 - 工具 schema 校验、超时、重试和降级
 - SSE 流式事件
