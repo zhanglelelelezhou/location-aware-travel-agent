@@ -1,8 +1,45 @@
+name: location-aware-travel-agent
+
 services:
   api:
-    build: .
+    image: location-aware-travel-agent:local
+    build:
+      context: .
+      args:
+        INSTALL_EXTRAS: ${INSTALL_EXTRAS:-}
+    init: true
     ports:
-      - "8000:8000"
+      - "${APP_PORT:-8000}:8000"
     environment:
-      AGENT_PROVIDER: mock
+      APP_ENV: ${APP_ENV:-production}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      AGENT_PROVIDER: ${AGENT_PROVIDER:-mock}
+      AGENT_PLANNER: ${AGENT_PLANNER:-rule}
+      KNOWLEDGE_RETRIEVAL: ${KNOWLEDGE_RETRIEVAL:-bm25}
+      KNOWLEDGE_EMBEDDING_MODEL: ${KNOWLEDGE_EMBEDDING_MODEL:-sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2}
+      KNOWLEDGE_DENSE_MIN_SCORE: ${KNOWLEDGE_DENSE_MIN_SCORE:-0.60}
+      SESSION_MAX_SESSIONS: ${SESSION_MAX_SESSIONS:-1000}
+      SESSION_TTL_SECONDS: ${SESSION_TTL_SECONDS:-1800}
+      PENDING_ACTION_TTL_SECONDS: ${PENDING_ACTION_TTL_SECONDS:-900}
+      WEATHER_TIMEOUT_SECONDS: ${WEATHER_TIMEOUT_SECONDS:-8}
+      POI_TIMEOUT_SECONDS: ${POI_TIMEOUT_SECONDS:-12}
+      MCP_SERVER_PROVIDER: ${MCP_SERVER_PROVIDER:-open-data}
+      MCP_SERVER_URL: ${MCP_SERVER_URL:-}
+      MCP_TIMEOUT_SECONDS: ${MCP_TIMEOUT_SECONDS:-20}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_JSON_MODE: ${LLM_JSON_MODE:-true}
+      LLM_THINKING_MODE: ${LLM_THINKING_MODE:-disabled}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-1500}
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    volumes:
+      - model-cache:/app/.cache
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
 
+volumes:
+  model-cache:

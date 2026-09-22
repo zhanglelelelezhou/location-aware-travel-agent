@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、SSE 状态事件、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、SSE 状态事件、非 root Docker 运行时、CI 质量门禁、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -25,6 +25,15 @@ python -m pip install -e ".[dev]"
 pytest
 uvicorn travel_agent.api:app --reload
 ```
+
+不安装本地 Python 依赖也可以使用 Docker Compose，一条命令启动完全离线的 rule + mock 演示：
+
+```bash
+docker compose up --build
+curl http://127.0.0.1:8000/health
+```
+
+容器以 UID 10001 非 root 用户运行，默认只读根文件系统并带健康检查。CI 会在 Python 3.10/3.11/3.12 上运行测试，在 3.11 上强制 85% 覆盖率门槛，并实际构建、启动和调用镜像。详见[容器化与持续集成](docs/deployment.md)。
 
 调用示例：
 
@@ -269,6 +278,8 @@ Every transition -> versioned SSE event (optional observer)
 - [x] 有界结构化会话记忆、TTL、会话隔离与清除接口
 - [x] booking pending action、独立 approve/reject 与一次性防重放
 - [x] 具名 SSE 生命周期事件、单调序号、keepalive 与最终响应
+- [x] 非 root Docker、只读 Compose、健康检查与可选 RAG 构建
+- [x] Python 版本矩阵、85% 覆盖率门禁、离线评测与容器冒烟 CI
 - [ ] Rerank、按主题校准拒答和更大规模盲测
 - [ ] 持久化会话存储、真实 booking gateway 与幂等对账
 - [ ] OpenTelemetry/Langfuse trace 导出与流式连接限流
@@ -282,6 +293,7 @@ Every transition -> versioned SSE event (optional observer)
 - [知识检索设计](docs/knowledge-retrieval.md)
 - [会话记忆与人工确认](docs/session-memory.md)
 - [SSE 事件协议](docs/streaming.md)
+- [容器化与持续集成](docs/deployment.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)

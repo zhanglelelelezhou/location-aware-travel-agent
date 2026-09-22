@@ -37,6 +37,7 @@
 - 增加显式 `session_id` 的短期结构化记忆，只保存位置、可信坐标和偏好，并用 TTL、LRU 上限、会话隔离、显式覆盖与清除接口控制状态；未提供 session 的请求保持无状态。
 - 把 booking 授权从模型判断移到确定性服务层：首次请求只创建绑定会话的 pending action，独立 approve/reject 端点原子消费一次性令牌。默认 dry-run 不发送外部请求，测试证明批准前零调用、拒绝零调用、跨会话/重放零调用。
 - 在不复制 Agent 流程的前提下给 LangGraph 节点加入 observer，将规划、工具、验证、恢复、记忆和等待确认转成版本化 SSE 事件；工具失败时前端能看到一次有界恢复，最终事件仍返回完整可审计 trace。
+- 将最小 Dockerfile 加固为非 root、健康检查和可选 RAG extra 的运行时，Compose 默认只读且不依赖密钥；CI 使用三版本 Python 矩阵、85% 覆盖率门禁、离线评测和真实容器 HTTP 冒烟，第三方 Actions 固定完整 SHA 且只授予只读仓库权限。
 
 ## 结果如何表达
 

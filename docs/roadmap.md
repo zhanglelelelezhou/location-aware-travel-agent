@@ -43,7 +43,7 @@
 
 - 50 条以上场景化评测集和错误分类
 - OpenTelemetry/Langfuse 可观测性
-- Docker Compose、GitHub Actions 和部署说明
+- [x] 非 root Docker Compose、GitHub Actions 和部署说明
 - 架构图、90 秒演示视频、简历 bullet 和完整面试复盘
 
 完成标准：面试官可以在十分钟内理解价值，在三条命令内运行项目，并从报告中看到真实指标与限制。
