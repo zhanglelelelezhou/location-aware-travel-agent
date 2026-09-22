@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client 执行链路、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -67,6 +67,30 @@ travel-agent "东京站附近有什么餐厅" \
 ```
 
 `open-data` 模式使用 OpenStreetMap Overpass 搜索附近地点，结果携带距离、标签证据、OSM 来源链接和署名。真实 POI 必须提供可信坐标；公共 Overpass 实例仅用于低频作品集演示，生产部署需要缓存、限流并自建或更换供应商。
+
+## 会话记忆与人工确认
+
+不传 `session_id` 时 API 保持无状态。显式传入后，只保存位置、可信坐标和偏好，不保存无限聊天历史或完整工具输出：
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"记住我的位置和偏好","session_id":"demo-001","location":"京都站","preferences":["素食"]}'
+
+curl -X POST http://127.0.0.1:8000/v1/chat \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"附近找一家餐厅","session_id":"demo-001"}'
+```
+
+预订请求只创建带 TTL 的 pending action，确认前不会调用 booking gateway。客户端取得 `trace.pending_action_id` 后，通过独立端点批准或拒绝：
+
+```bash
+curl -X POST http://127.0.0.1:8000/v1/sessions/demo-001/confirm \
+  -H 'Content-Type: application/json' \
+  -d '{"action_id":"<32-character-action-id>","decision":"approve"}'
+```
+
+令牌绑定会话并在处理前原子消费，重复提交不会再次执行。默认 gateway 是明确标注的 dry-run，不会向外部商家发送请求；生产接入真实供应商时必须增加身份认证、持久化幂等键和状态对账。详见[会话记忆与人工确认](docs/session-memory.md)。
 
 ## MCP Server
 
@@ -183,13 +207,15 @@ python evals/compare_reports.py \
 
 ```text
 Request
+  -> Recall explicit session facts (optional, bounded)
   -> Understand
   -> Plan (semantic LLM / rule fallback)
   -> Enforce deterministic policy
+  -> Booking? -- yes --> Persist pending action -> Wait for one-time confirmation
   -> Execute tools (Mock / Open-Meteo / OpenStreetMap / cited knowledge / MCP)
   -> Verify -- failed once --> Recover -> Execute
        |
-       +-- success / retry exhausted --> Respond
+       +-- success / retry exhausted --> Store explicit facts -> Respond
 ```
 
 核心接口与工具实现解耦，因此 Mock、真实 HTTP API 和 MCP 工具可以复用同一工作流。
@@ -214,8 +240,11 @@ Request
 - [x] 官方来源知识快照、BM25 基线、引用输出与检索评测
 - [ ] MCP Server：翻译与旅行知识
 - [x] 多语稠密检索与 RRF 混合召回盲测消融（负结果如实保留）
+- [x] 有界结构化会话记忆、TTL、会话隔离与清除接口
+- [x] booking pending action、独立 approve/reject 与一次性防重放
 - [ ] Rerank、按主题校准拒答和更大规模盲测
-- [ ] SSE 流式响应、会话记忆和人工确认
+- [ ] 持久化会话存储、真实 booking gateway 与幂等对账
+- [ ] SSE 流式响应
 - [ ] 多次重复评测、参数准确率与 50+ 条评测集
 - [ ] Docker Compose、CI 和在线演示
 
@@ -224,6 +253,7 @@ Request
 - [架构与边界](docs/architecture.md)
 - [工具契约](docs/tool-contracts.md)
 - [知识检索设计](docs/knowledge-retrieval.md)
+- [会话记忆与人工确认](docs/session-memory.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)
