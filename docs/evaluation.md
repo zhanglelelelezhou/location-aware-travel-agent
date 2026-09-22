@@ -36,7 +36,7 @@ python evals/run_eval.py --planner rule --output evals/results/rule-baseline.jso
 
 LLM 负责识别自然语言意图并生成候选计划；代码策略负责不可协商的产品不变量。当前策略包括：行程任务在已知位置时必须同时查询 POI 与天气、缺少位置时禁止执行工具，以及预订在用户确认前禁止执行工具。策略的每次补正都写入 `policy_adjustments`，而不是静默篡改模型输出。
 
-这种分工避免为了确定性规则反复调 Prompt，也让面试官可以从 trace 判断最终成功来自模型原生计划还是策略补正。
+这种分工避免为了确定性规则反复调 Prompt，也让审阅者可以从 trace 判断最终成功来自模型原生计划还是策略补正。
 
 ## DeepSeek 真实模型结果
 

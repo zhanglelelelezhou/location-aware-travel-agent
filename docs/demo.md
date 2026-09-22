@@ -1,4 +1,4 @@
-# 3 分钟作品集演示
+# 3 分钟离线演示
 
 ## 演示前准备
 
@@ -36,9 +36,4 @@ python scripts/demo_portfolio.py
 
 “系统验收首次是 90%，保留失败报告；修复通用意图消歧后，同哈希回归达到 100%。这个分数是确定性契约门禁，不代表真实模型或外部数据的生产准确率。”
 
-## 面试官继续追问时
-
-- 为什么是 Agent：见[面试问题 1](interview-guide.md)。
-- 为什么不用多 Agent：见[面试问题 3](interview-guide.md)。
-- 评测是否泄漏：见[面试问题 43](interview-guide.md)。
 - 生产化缺口：重点说明内存会话、鉴权、真实 booking gateway、供应商幂等对账与 SSE 背压。

@@ -11,3 +11,7 @@ dist/
 build/
 *.egg-info/
 .cache/
+
+# Local job-search and interview preparation (never publish)
+docs/resume-entry.md
+docs/interview-guide.local.md

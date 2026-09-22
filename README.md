@@ -6,7 +6,7 @@
 
 一个面向跨境旅行场景、可复现且可审计的 AI Agent。它把位置、偏好和旅行知识转成受约束的工具计划，并显式处理记忆、确认、失败恢复与执行追踪。
 
-> 作品集状态：核心功能与离线验收已完成。默认 Rule Planner + Mock tools 不需要 API Key；可选接入 DeepSeek、Open-Meteo、OpenStreetMap 和 MCP。项目是基于真实实习场景的个人重构，不包含原公司代码、数据或商业机密。
+> 项目状态：核心功能与离线验收已完成。默认 Rule Planner + Mock tools 不需要 API Key；可选接入 DeepSeek、Open-Meteo、OpenStreetMap 和 MCP。项目是基于真实实习场景的个人重构，不包含原公司代码、数据或商业机密。
 
 ## 一眼看懂
 
@@ -67,7 +67,7 @@ uvicorn travel_agent.api:app --reload
 python scripts/demo_portfolio.py
 ```
 
-它依次展示复合工具规划、有界记忆、一次性人工确认和 SSE 生命周期，讲解提纲见[3 分钟作品集演示](docs/demo.md)。
+它依次展示复合工具规划、有界记忆、一次性人工确认和 SSE 生命周期，运行说明见[3 分钟离线演示](docs/demo.md)。
 
 不安装本地 Python 依赖也可以使用 Docker Compose，一条命令启动完全离线的 rule + mock 演示：
 
@@ -118,7 +118,7 @@ travel-agent "东京站附近有什么餐厅" \
   --tools open-data
 ```
 
-`open-data` 模式使用 OpenStreetMap Overpass 搜索附近地点，结果携带距离、标签证据、OSM 来源链接和署名。真实 POI 必须提供可信坐标；公共 Overpass 实例仅用于低频作品集演示，生产部署需要缓存、限流并自建或更换供应商。
+`open-data` 模式使用 OpenStreetMap Overpass 搜索附近地点，结果携带距离、标签证据、OSM 来源链接和署名。真实 POI 必须提供可信坐标；公共 Overpass 实例仅用于低频项目演示，生产部署需要缓存、限流并自建或更换供应商。
 
 ## 会话记忆与人工确认
 
@@ -312,7 +312,7 @@ Every transition -> versioned SSE event (optional observer)
 - [x] 可运行的 LangGraph 状态机
 - [x] Mock POI、天气、翻译和旅行知识工具
 - [x] 执行轨迹、一次重试和基础测试
-- [x] 项目故事与首批面试问题
+- [x] 项目背景与能力边界文档
 - [x] LLM Provider 抽象与结构化输出
 - [x] 一次格式修复、工具白名单与规则降级
 - [x] 20 条规则/LLM 共用评测集
@@ -348,11 +348,9 @@ Every transition -> versioned SSE event (optional observer)
 - [会话记忆与人工确认](docs/session-memory.md)
 - [SSE 事件协议](docs/streaming.md)
 - [容器化与持续集成](docs/deployment.md)
-- [3 分钟作品集演示](docs/demo.md)
-- [GitHub 发布检查清单](docs/release-checklist.md)
+- [3 分钟离线演示](docs/demo.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
-- [面试问题库](docs/interview-guide.md)
 - [评测说明](docs/evaluation.md)
 - [端到端系统验收](docs/final-evaluation.md)
 - [迭代计划](docs/roadmap.md)
@@ -361,7 +359,7 @@ Every transition -> versioned SSE event (optional observer)
 
 - 不把规则路由包装成大模型自主规划；每一阶段都会明确能力边界。
 - README 中只展示由评测脚本实际生成的指标。
-- 第三方服务不可用时提供 fixture，确保面试官能够复现核心链路。
+- 第三方服务不可用时提供 fixture，确保审阅者能够复现核心链路。
 - 所有技术选型都要能回答“为什么”，而不是为了堆砌框架。
 
 ## License
