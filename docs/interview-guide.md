@@ -147,3 +147,19 @@ LLM 不能生成任意 Overpass QL。adapter 只接收类别白名单、可信�
 ## 37. 当前 SSE 实现有哪些生产风险？
 
 底层工具仍是同步调用，所以当前每个流使用一个 daemon worker 和线程安全 Queue。客户端断连不会取消已开始的有界执行，也没有用户级连接数与队列容量限制。生产环境要改为 async adapter、断连取消、背压、速率限制和代理 idle timeout；同时对 `tool.completed` 和最终 trace 做权限控制与字段脱敏，避免把用户数据直接写入日志或展示给错误的客户端。
+
+## 38. Docker 镜像做了哪些最基本的安全加固？
+
+镜像只复制运行所需的 `pyproject.toml`、README 和 `src`，`.dockerignore` 排除 `.env`、Git、缓存、虚拟环境和评测文件；运行时使用 UID/GID 10001，而不是 root。Compose 进一步设置只读根文件系统、`no-new-privileges` 和受限 `/tmp`，可选模型只写独立 cache volume。密钥只作为运行时环境变量进入，绝不作为 build arg 烘进镜像。
+
+## 39. 为什么容器不直接开多个 Uvicorn worker？
+
+当前 Session Store 是进程内内存，多 worker 会让同一个 `session_id` 随负载均衡落到不同状态。与其为了吞吐量制造静默一致性错误，我固定单 worker 并在文档中说明边界。迁移到支持原子状态转换和 TTL 的 Redis/PostgreSQL 后，才能安全增加 worker 和副本，同时还要处理 SSE 连接与优雅关闭。
+
+## 40. CI 为什么还要真的启动 Docker，单元测试不够吗？
+
+单元测试无法发现 COPY 漏文件、非 root 权限、启动命令、端口、只读文件系统和健康检查问题。容器 job 会构建镜像、验证 UID 10001、以只读模式启动，然后调用 `/health` 和真实 `/v1/chat`。这样 CI 验证的是可交付产物，而不只是宿主机上的 Python 包。
+
+## 41. GitHub Actions 有哪些供应链与权限控制？
+
+工作流全局只授予 `contents: read`，checkout 设置 `persist-credentials: false`；官方 checkout 和 setup-python 都固定到已核对 release 的完整 commit SHA，而不是可变的 major tag。pull request CI 使用 rule + mock，不读取 secrets，也不登录 registry。未来发布镜像会单独放在受保护的 release workflow，避免把写权限混进普通 PR 验证。
