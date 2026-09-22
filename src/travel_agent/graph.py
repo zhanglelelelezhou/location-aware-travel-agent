@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any, TypedDict
 
 from langgraph.graph import END, START, StateGraph
@@ -37,14 +38,35 @@ class AgentState(TypedDict, total=False):
     needs_confirmation: bool
 
 
+AgentEventSink = Callable[[str, dict[str, Any]], None]
+
+
+def _emit(
+    sink: AgentEventSink | None, event_type: str, data: dict[str, Any]
+) -> None:
+    if sink is not None:
+        sink(event_type, data)
+
+
 def _understand(state: AgentState) -> dict[str, Any]:
     return {"retry_count": 0}
 
 
-def _plan_with(planner: Planner):
+def _plan_with(planner: Planner, event_sink: AgentEventSink | None):
     def plan(state: AgentState) -> dict[str, Any]:
+        _emit(event_sink, "planning.started", {})
         result = planner.plan(state["request"])
         decision = result.decision
+        _emit(
+            event_sink,
+            "planning.completed",
+            {
+                "decision": decision.model_dump(mode="json"),
+                "planner_used": result.planner_used,
+                "repaired": result.repaired,
+                "policy_adjustments": result.policy_adjustments,
+            },
+        )
         return {
             "intents": decision.intents,
             "plan": decision.tool_calls,
@@ -69,11 +91,19 @@ def _route_after_plan(state: AgentState) -> str:
     return "execute"
 
 
-def _execute_with(registry: ToolRegistry):
+def _execute_with(
+    registry: ToolRegistry, event_sink: AgentEventSink | None
+):
     def execute(state: AgentState) -> dict[str, Any]:
         executions: list[ToolExecution] = []
         first_error: str | None = None
         plan = state.get("plan", [])
+        for call in plan:
+            _emit(
+                event_sink,
+                "tool.started",
+                {"name": call.name, "arguments": call.arguments},
+            )
         outcomes = registry.invoke_many(
             [(call.name, call.arguments) for call in plan]
         )
@@ -95,18 +125,35 @@ def _execute_with(registry: ToolRegistry):
                         error=str(outcome),
                     )
                 )
+            _emit(
+                event_sink,
+                "tool.completed",
+                {"execution": executions[-1].model_dump(mode="json")},
+            )
         return {"executions": executions, "error": first_error}
 
     return execute
 
 
-def _verify(state: AgentState) -> dict[str, Any]:
-    if not state.get("plan"):
-        return {"error": None}
-    failed = [item.name for item in state.get("executions", []) if item.error]
-    if failed:
-        return {"error": state.get("error") or f"Tools failed: {', '.join(failed)}"}
-    return {"error": None}
+def _verify_with(event_sink: AgentEventSink | None):
+    def verify(state: AgentState) -> dict[str, Any]:
+        if not state.get("plan"):
+            error = None
+        else:
+            failed = [item.name for item in state.get("executions", []) if item.error]
+            error = (
+                state.get("error") or f"Tools failed: {', '.join(failed)}"
+                if failed
+                else None
+            )
+        _emit(
+            event_sink,
+            "verification.completed",
+            {"success": error is None, "error": error},
+        )
+        return {"error": error}
+
+    return verify
 
 
 def _route_after_verify(state: AgentState) -> str:
@@ -115,8 +162,13 @@ def _route_after_verify(state: AgentState) -> str:
     return "respond"
 
 
-def _recover(state: AgentState) -> dict[str, Any]:
-    return {"retry_count": state.get("retry_count", 0) + 1, "error": None}
+def _recover_with(event_sink: AgentEventSink | None):
+    def recover(state: AgentState) -> dict[str, Any]:
+        retry_count = state.get("retry_count", 0) + 1
+        _emit(event_sink, "recovery.started", {"retry_count": retry_count})
+        return {"retry_count": retry_count, "error": None}
+
+    return recover
 
 
 def _respond(state: AgentState) -> dict[str, Any]:
@@ -190,15 +242,19 @@ def _respond(state: AgentState) -> dict[str, Any]:
     return {"answer": answer, "response": response}
 
 
-def build_agent(registry: ToolRegistry | None = None, planner: Planner | None = None):
+def build_agent(
+    registry: ToolRegistry | None = None,
+    planner: Planner | None = None,
+    event_sink: AgentEventSink | None = None,
+):
     registry = registry or build_mock_registry()
     planner = planner or RulePlanner()
     workflow = StateGraph(AgentState)
     workflow.add_node("understand", _understand)
-    workflow.add_node("plan", _plan_with(planner))
-    workflow.add_node("execute", _execute_with(registry))
-    workflow.add_node("verify", _verify)
-    workflow.add_node("recover", _recover)
+    workflow.add_node("plan", _plan_with(planner, event_sink))
+    workflow.add_node("execute", _execute_with(registry, event_sink))
+    workflow.add_node("verify", _verify_with(event_sink))
+    workflow.add_node("recover", _recover_with(event_sink))
     workflow.add_node("respond", _respond)
 
     workflow.add_edge(START, "understand")
@@ -219,6 +275,7 @@ def run_agent(
     request: TravelRequest,
     registry: ToolRegistry | None = None,
     planner: Planner | None = None,
+    event_sink: AgentEventSink | None = None,
 ) -> AgentResponse:
-    result = build_agent(registry, planner).invoke({"request": request})
+    result = build_agent(registry, planner, event_sink).invoke({"request": request})
     return result["response"]

@@ -1,10 +1,12 @@
 from typing import Annotated
 
 from fastapi import FastAPI, Path
+from fastapi.responses import StreamingResponse
 
 from travel_agent.models import AgentResponse, ChatRequest, ConfirmationRequest
 from travel_agent.planner import build_planner_from_env
 from travel_agent.session import ConversationService, build_session_store_from_env
+from travel_agent.streaming import stream_conversation
 from travel_agent.tools import build_tool_registry_from_env
 
 planner = build_planner_from_env()
@@ -38,6 +40,18 @@ def health() -> dict[str, str]:
 @app.post("/v1/chat", response_model=AgentResponse)
 def chat(request: ChatRequest) -> AgentResponse:
     return conversation_service.chat(request)
+
+
+@app.post("/v1/chat/stream")
+def chat_stream(request: ChatRequest) -> StreamingResponse:
+    return StreamingResponse(
+        stream_conversation(conversation_service, request),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.post(
