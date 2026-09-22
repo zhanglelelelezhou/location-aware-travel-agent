@@ -1,8 +1,39 @@
 # Location-Aware Travel Agent
 
-一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
+一个面向跨境旅行场景、可复现且可审计的 AI Agent。它把位置、偏好和旅行知识转成受约束的工具计划，并显式处理记忆、确认、失败恢复与执行追踪。
 
-> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、SSE 状态事件、非 root Docker 运行时、CI 质量门禁、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 作品集状态：核心功能与离线验收已完成。默认 Rule Planner + Mock tools 不需要 API Key；可选接入 DeepSeek、Open-Meteo、OpenStreetMap 和 MCP。项目是基于真实实习场景的个人重构，不包含原公司代码、数据或商业机密。
+
+## 一眼看懂
+
+| 能力 | 实现与证据 |
+| --- | --- |
+| 结构化规划 | DeepSeek / Rule Planner、Pydantic Schema、工具白名单、一次修复与规则降级 |
+| Agent 编排 | LangGraph 显式状态、确定性策略、一次有界恢复、完整 trace |
+| 工具与知识 | 真实天气/POI、带官方引用的旅行知识、MCP Server/Client |
+| 状态与安全 | 有界结构化记忆、预订前显式确认、会话绑定和一次性防重放 |
+| 可观察性 | 版本化 SSE 生命周期事件，而非伪造的字符流进度 |
+| 工程质量 | Python 版本矩阵、85% 覆盖率门禁、离线评测、非 root 容器冒烟 |
+
+```mermaid
+flowchart LR
+    A[API / CLI / MCP Host] --> B[Session recall]
+    B --> C[LLM or Rule Planner]
+    C --> D[Deterministic policy]
+    D --> E{Side effect?}
+    E -- Booking --> F[Pending action]
+    F --> G[Explicit approve / reject]
+    E -- Read only --> H[LangGraph execution]
+    G --> H
+    H --> I[POI / Weather / Knowledge / Translation]
+    I --> J[Verify and bounded recovery]
+    J --> K[Answer + auditable trace]
+    B -. events .-> L[SSE lifecycle]
+    C -. events .-> L
+    H -. events .-> L
+```
+
+关键结果：20 条冻结 Planner 留出集上，规则基线为 50%，DeepSeek + 策略层为 85%；30 条系统契约首次验收为 90%，通用修复后的同集回归为 100%。两类数字用途不同，完整边界见[评测说明](docs/evaluation.md)。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -25,6 +56,14 @@ python -m pip install -e ".[dev]"
 pytest
 uvicorn travel_agent.api:app --reload
 ```
+
+只想快速了解项目时，运行无需网络和密钥的完整演示：
+
+```bash
+python scripts/demo_portfolio.py
+```
+
+它依次展示复合工具规划、有界记忆、一次性人工确认和 SSE 生命周期，讲解提纲见[3 分钟作品集演示](docs/demo.md)。
 
 不安装本地 Python 依赖也可以使用 Docker Compose，一条命令启动完全离线的 rule + mock 演示：
 
@@ -305,6 +344,8 @@ Every transition -> versioned SSE event (optional observer)
 - [会话记忆与人工确认](docs/session-memory.md)
 - [SSE 事件协议](docs/streaming.md)
 - [容器化与持续集成](docs/deployment.md)
+- [3 分钟作品集演示](docs/demo.md)
+- [GitHub 发布检查清单](docs/release-checklist.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)
