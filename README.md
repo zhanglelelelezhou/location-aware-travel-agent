@@ -359,3 +359,7 @@ Every transition -> versioned SSE event (optional observer)
 - README 中只展示由评测脚本实际生成的指标。
 - 第三方服务不可用时提供 fixture，确保面试官能够复现核心链路。
 - 所有技术选型都要能回答“为什么”，而不是为了堆砌框架。
+
+## License
+
+本项目采用 [MIT License](LICENSE)，Copyright (c) 2026 张文乐。
