@@ -10,6 +10,7 @@ from travel_agent.planner import (
     LLMPlanner,
     OpenAICompatibleProvider,
     ProviderResult,
+    detect_intents,
 )
 
 
@@ -37,6 +38,16 @@ class SequenceProvider:
             prompt_tokens=10,
             completion_tokens=4,
         )
+
+
+def test_rule_intent_disambiguation_uses_dominant_user_action() -> None:
+    assert detect_intents("我对花生严重过敏，点餐时要注意什么") == ["safety"]
+    assert detect_intents("帮我预约今晚七点的餐位") == ["booking"]
+    assert detect_intents("Book a table for two tonight") == ["booking"]
+
+
+def test_safety_and_dining_remain_distinct_for_venue_discovery() -> None:
+    assert detect_intents("推荐适合花生过敏者的餐厅") == ["dining", "safety"]
 
 
 def test_llm_planner_accepts_valid_structured_plan() -> None:

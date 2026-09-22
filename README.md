@@ -222,6 +222,15 @@ python evals/compare_reports.py \
 
 报告会记录数据集路径与 SHA-256、原生 LLM 通过率、策略补正、规则降级、格式修复、Planner 与端到端 P50/P95 延迟、Token 用量及估算成本。报告不会保存 API Key。
 
+运行完全离线的端到端系统验收：
+
+```bash
+python evals/run_system_eval.py \
+  --output evals/results/system-acceptance.json
+```
+
+30 条冻结契约覆盖单轮规划、多轮记忆、一次性确认、SSE 生命周期和故障恢复。首次运行 27/30，错误分类定位到 3 个规则意图消歧问题；不改样本和评分器，完成通用修复后同哈希回归为 30/30。后者是 CI 回归结果，不是未消费留出成绩，也不代表真实模型或外部数据质量。详见[端到端系统验收](docs/final-evaluation.md)。
+
 ## 当前可复现实验结果
 
 20 条开发集与 20 条冻结留出集上的单次对照：
@@ -280,11 +289,13 @@ Every transition -> versioned SSE event (optional observer)
 - [x] 具名 SSE 生命周期事件、单调序号、keepalive 与最终响应
 - [x] 非 root Docker、只读 Compose、健康检查与可选 RAG 构建
 - [x] Python 版本矩阵、85% 覆盖率门禁、离线评测与容器冒烟 CI
+- [x] 30 条端到端系统验收、错误分类、初始/修复后审计报告与 CI 门禁
 - [ ] Rerank、按主题校准拒答和更大规模盲测
 - [ ] 持久化会话存储、真实 booking gateway 与幂等对账
 - [ ] OpenTelemetry/Langfuse trace 导出与流式连接限流
-- [ ] 多次重复评测、参数准确率与 50+ 条评测集
-- [ ] Docker Compose、CI 和在线演示
+- [x] 分层评测总量超过 50 条，并覆盖工具参数准确率
+- [ ] 多次 LLM 重复评测和新的未消费泛化测试集
+- [ ] 在线演示
 
 ## 文档
 
@@ -298,6 +309,7 @@ Every transition -> versioned SSE event (optional observer)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)
 - [评测说明](docs/evaluation.md)
+- [端到端系统验收](docs/final-evaluation.md)
 - [迭代计划](docs/roadmap.md)
 
 ## 真实性原则
