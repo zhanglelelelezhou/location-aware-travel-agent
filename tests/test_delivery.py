@@ -54,4 +54,5 @@ def test_ci_actions_are_sha_pinned_and_permissions_are_read_only() -> None:
     assert all(re.fullmatch(r"[^@]+@[0-9a-f]{40}", ref) for ref in action_references)
     assert "persist-credentials: false" in workflow_text
     assert "--cov-fail-under=85" in workflow_text
+    assert "python evals/run_system_eval.py" in workflow_text
     assert "docker build --tag location-aware-travel-agent:ci ." in workflow_text

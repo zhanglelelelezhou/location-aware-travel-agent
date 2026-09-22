@@ -68,6 +68,10 @@ jobs:
         if: matrix.python-version == '3.11'
         run: python evals/run_knowledge_eval.py
 
+      - name: Deterministic system acceptance gate
+        if: matrix.python-version == '3.11'
+        run: python evals/run_system_eval.py
+
   container:
     name: Container smoke test
     needs: quality

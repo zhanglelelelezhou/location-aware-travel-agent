@@ -1,0 +1,1103 @@
+{
+  "evaluation": "system-acceptance-v1",
+  "scoring_policy": "all-applicable-contract-checks-must-pass",
+  "environment": {
+    "planner": "rule",
+    "tools": "mock",
+    "network_required": false
+  },
+  "dataset": {
+    "path": "evals/system_cases.jsonl",
+    "sha256": "ad50e28be5c002baafee1c8385bd3d918ce221713198d0c7cae4db67ff1bd0c3",
+    "case_count": 30,
+    "category_counts": {
+      "confirmation": 5,
+      "session": 5,
+      "single_turn": 16,
+      "stream": 4
+    }
+  },
+  "passed": 27,
+  "task_pass_rate": 0.9,
+  "dimension_accuracy": {
+    "answer": 1.0,
+    "arguments": 1.0,
+    "confirmation": 1.0,
+    "constraints": 1.0,
+    "intent": 0.8571428571428571,
+    "lifecycle": 1.0,
+    "memory": 1.0,
+    "recovery": 1.0,
+    "safety": 1.0,
+    "tools": 1.0
+  },
+  "category_pass_rate": {
+    "confirmation": 1.0,
+    "session": 1.0,
+    "single_turn": 0.8125,
+    "stream": 1.0
+  },
+  "latency_ms": {
+    "p50": 7.936,
+    "p95": 15.876
+  },
+  "error_taxonomy": {
+    "intent_mismatch": 3,
+    "tool_mismatch": 0,
+    "constraint_mismatch": 0,
+    "answer_evidence_missing": 0,
+    "memory_mismatch": 0,
+    "confirmation_mismatch": 0,
+    "lifecycle_mismatch": 0,
+    "recovery_mismatch": 0,
+    "runtime_error": 0
+  },
+  "failure_count": 3,
+  "failures": [
+    {
+      "id": "single_safety_allergy",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "safety"
+        ],
+        "tools": [
+          "search_travel_knowledge"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "有严重食物过敏时，应向店员确认配料和交叉污染风险。",
+        "tool_arguments": {
+          "search_travel_knowledge": {
+            "query": "我对花生严重过敏，点餐时要注意什么"
+          }
+        }
+      },
+      "latency_ms": 7.904
+    },
+    {
+      "id": "single_booking_cn",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "booking"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": true,
+        "answer": "该请求可能产生外部操作，需要你明确确认后才能继续。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.463
+    },
+    {
+      "id": "single_booking_en",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "booking"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": true,
+        "answer": "该请求可能产生外部操作，需要你明确确认后才能继续。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.378
+    }
+  ],
+  "details": [
+    {
+      "id": "single_dining_cn",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining"
+        ],
+        "tools": [
+          "search_poi"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从大阪站步行约8分钟。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "大阪站",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [
+              "素食"
+            ],
+            "categories": [
+              "restaurant",
+              "cafe"
+            ]
+          }
+        }
+      },
+      "latency_ms": 11.035
+    },
+    {
+      "id": "single_dining_translation_cn",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining",
+          "translation"
+        ],
+        "tools": [
+          "search_poi",
+          "translate_phrase"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从大阪站步行约8分钟。 可向店员询问：ベジタリアン向けの料理はありますか？",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "大阪站",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [
+              "素食"
+            ],
+            "categories": [
+              "restaurant",
+              "cafe"
+            ]
+          },
+          "translate_phrase": {
+            "text": "大阪站附近找一家素食餐厅，并生成一句日语询问语",
+            "target_language": "ja",
+            "preferences": [
+              "素食"
+            ]
+          }
+        }
+      },
+      "latency_ms": 8.299
+    },
+    {
+      "id": "single_itinerary_cn",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "itinerary"
+        ],
+        "tools": [
+          "search_poi",
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从京都步行约8分钟。 当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "京都",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [],
+            "categories": [
+              "museum",
+              "attraction",
+              "park",
+              "place_of_worship"
+            ]
+          },
+          "get_weather": {
+            "location": "京都",
+            "latitude": null,
+            "longitude": null
+          }
+        }
+      },
+      "latency_ms": 8.078
+    },
+    {
+      "id": "single_weather_en",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "weather"
+        ],
+        "tools": [
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "get_weather": {
+            "location": "Nara",
+            "latitude": null,
+            "longitude": null
+          }
+        }
+      },
+      "latency_ms": 8.236
+    },
+    {
+      "id": "single_translation_en",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "translation"
+        ],
+        "tools": [
+          "translate_phrase"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "可向店员询问：旅行中に使う翻訳文です。",
+        "tool_arguments": {
+          "translate_phrase": {
+            "text": "Translate where is platform three into Japanese",
+            "target_language": "ja",
+            "preferences": []
+          }
+        }
+      },
+      "latency_ms": 7.936
+    },
+    {
+      "id": "single_safety_allergy",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "safety"
+        ],
+        "tools": [
+          "search_travel_knowledge"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "有严重食物过敏时，应向店员确认配料和交叉污染风险。",
+        "tool_arguments": {
+          "search_travel_knowledge": {
+            "query": "我对花生严重过敏，点餐时要注意什么"
+          }
+        }
+      },
+      "latency_ms": 7.904
+    },
+    {
+      "id": "single_safety_earthquake",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "safety"
+        ],
+        "tools": [
+          "search_travel_knowledge"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "有严重食物过敏时，应向店员确认配料和交叉污染风险。",
+        "tool_arguments": {
+          "search_travel_knowledge": {
+            "query": "在日本遇到地震应该怎么办"
+          }
+        }
+      },
+      "latency_ms": 7.893
+    },
+    {
+      "id": "single_safety_passport",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "safety"
+        ],
+        "tools": [
+          "search_travel_knowledge"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "有严重食物过敏时，应向店员确认配料和交叉污染风险。",
+        "tool_arguments": {
+          "search_travel_knowledge": {
+            "query": "护照丢了应该去哪里报案"
+          }
+        }
+      },
+      "latency_ms": 7.924
+    },
+    {
+      "id": "single_general_greeting",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "general"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "我已理解请求，但当前 Mock 工具还不支持这个场景。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.826
+    },
+    {
+      "id": "single_unsupported_currency",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "general"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "我已理解请求，但当前 Mock 工具还不支持这个场景。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.983
+    },
+    {
+      "id": "single_missing_dining_location",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining"
+        ],
+        "tools": [],
+        "missing_fields": [
+          "location"
+        ],
+        "needs_confirmation": false,
+        "answer": "继续处理前还需要提供：location。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.369
+    },
+    {
+      "id": "single_missing_weather_location",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "weather"
+        ],
+        "tools": [],
+        "missing_fields": [
+          "location"
+        ],
+        "needs_confirmation": false,
+        "answer": "继续处理前还需要提供：location。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.34
+    },
+    {
+      "id": "single_booking_cn",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "booking"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": true,
+        "answer": "该请求可能产生外部操作，需要你明确确认后才能继续。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.463
+    },
+    {
+      "id": "single_booking_en",
+      "category": "single_turn",
+      "passed": false,
+      "checks": {
+        "intent": false,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [
+        "intent_mismatch"
+      ],
+      "actual": {
+        "intents": [
+          "dining",
+          "booking"
+        ],
+        "tools": [],
+        "missing_fields": [],
+        "needs_confirmation": true,
+        "answer": "该请求可能产生外部操作，需要你明确确认后才能继续。",
+        "tool_arguments": {}
+      },
+      "latency_ms": 7.378
+    },
+    {
+      "id": "single_itinerary_en",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "itinerary"
+        ],
+        "tools": [
+          "search_poi",
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从Umeda步行约8分钟。 当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "Umeda",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [],
+            "categories": [
+              "museum",
+              "attraction",
+              "park",
+              "place_of_worship"
+            ]
+          },
+          "get_weather": {
+            "location": "Umeda",
+            "latitude": null,
+            "longitude": null
+          }
+        }
+      },
+      "latency_ms": 7.883
+    },
+    {
+      "id": "single_trusted_coordinates",
+      "category": "single_turn",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "weather"
+        ],
+        "tools": [
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "get_weather": {
+            "location": "东京",
+            "latitude": 35.6895,
+            "longitude": 139.6917
+          }
+        }
+      },
+      "latency_ms": 7.93
+    },
+    {
+      "id": "session_recall_location",
+      "category": "session",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining"
+        ],
+        "tools": [
+          "search_poi"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从京都站步行约8分钟。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "京都站",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [],
+            "categories": [
+              "restaurant",
+              "cafe"
+            ]
+          }
+        },
+        "memory_recalled": [
+          "location"
+        ]
+      },
+      "latency_ms": 15.876
+    },
+    {
+      "id": "session_recall_preferences",
+      "category": "session",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining"
+        ],
+        "tools": [
+          "search_poi"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从大阪站步行约8分钟。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "大阪站",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [
+              "素食"
+            ],
+            "categories": [
+              "restaurant",
+              "cafe"
+            ]
+          }
+        },
+        "memory_recalled": [
+          "location",
+          "preferences"
+        ]
+      },
+      "latency_ms": 15.691
+    },
+    {
+      "id": "session_recall_coordinates",
+      "category": "session",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "weather"
+        ],
+        "tools": [
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "get_weather": {
+            "location": "东京",
+            "latitude": 35.6895,
+            "longitude": 139.6917
+          }
+        },
+        "memory_recalled": [
+          "location",
+          "latitude",
+          "longitude"
+        ]
+      },
+      "latency_ms": 15.734
+    },
+    {
+      "id": "session_explicit_location_override",
+      "category": "session",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "weather"
+        ],
+        "tools": [
+          "get_weather"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "tool_arguments": {
+          "get_weather": {
+            "location": "大阪",
+            "latitude": null,
+            "longitude": null
+          }
+        },
+        "memory_recalled": []
+      },
+      "latency_ms": 15.693
+    },
+    {
+      "id": "session_accumulate_preferences",
+      "category": "session",
+      "passed": true,
+      "checks": {
+        "intent": true,
+        "tools": true,
+        "constraints": true,
+        "answer": true,
+        "arguments": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "intents": [
+          "dining"
+        ],
+        "tools": [
+          "search_poi"
+        ],
+        "missing_fields": [],
+        "needs_confirmation": false,
+        "answer": "推荐 Green Table Umeda，从京都步行约8分钟。",
+        "tool_arguments": {
+          "search_poi": {
+            "location": "京都",
+            "latitude": null,
+            "longitude": null,
+            "preferences": [
+              "素食",
+              "安静"
+            ],
+            "categories": [
+              "restaurant",
+              "cafe"
+            ]
+          }
+        },
+        "memory_recalled": [
+          "location",
+          "preferences"
+        ]
+      },
+      "latency_ms": 23.492
+    },
+    {
+      "id": "confirmation_approve_dry_run",
+      "category": "confirmation",
+      "passed": true,
+      "checks": {
+        "confirmation": true,
+        "safety": true
+      },
+      "errors": [],
+      "actual": {
+        "initial_status": "awaiting",
+        "pending_action_id_present": true,
+        "final_status": "approved",
+        "replay_status": null,
+        "external_request_sent": false,
+        "gateway_execution_count": 1,
+        "memory_recalled": []
+      },
+      "latency_ms": 7.444
+    },
+    {
+      "id": "confirmation_reject",
+      "category": "confirmation",
+      "passed": true,
+      "checks": {
+        "confirmation": true,
+        "safety": true
+      },
+      "errors": [],
+      "actual": {
+        "initial_status": "awaiting",
+        "pending_action_id_present": true,
+        "final_status": "rejected",
+        "replay_status": null,
+        "external_request_sent": null,
+        "gateway_execution_count": 0,
+        "memory_recalled": []
+      },
+      "latency_ms": 7.537
+    },
+    {
+      "id": "confirmation_replay_blocked",
+      "category": "confirmation",
+      "passed": true,
+      "checks": {
+        "confirmation": true,
+        "safety": true
+      },
+      "errors": [],
+      "actual": {
+        "initial_status": "awaiting",
+        "pending_action_id_present": true,
+        "final_status": "approved",
+        "replay_status": "invalid_or_expired",
+        "external_request_sent": false,
+        "gateway_execution_count": 1,
+        "memory_recalled": []
+      },
+      "latency_ms": 7.381
+    },
+    {
+      "id": "confirmation_cross_session_blocked",
+      "category": "confirmation",
+      "passed": true,
+      "checks": {
+        "confirmation": true,
+        "safety": true
+      },
+      "errors": [],
+      "actual": {
+        "initial_status": "awaiting",
+        "pending_action_id_present": true,
+        "final_status": "invalid_or_expired",
+        "replay_status": null,
+        "external_request_sent": null,
+        "gateway_execution_count": 0,
+        "memory_recalled": []
+      },
+      "latency_ms": 7.384
+    },
+    {
+      "id": "confirmation_recalled_location",
+      "category": "confirmation",
+      "passed": true,
+      "checks": {
+        "confirmation": true,
+        "safety": true,
+        "memory": true
+      },
+      "errors": [],
+      "actual": {
+        "initial_status": "awaiting",
+        "pending_action_id_present": true,
+        "final_status": "approved",
+        "replay_status": null,
+        "external_request_sent": false,
+        "gateway_execution_count": 1,
+        "memory_recalled": [
+          "location"
+        ]
+      },
+      "latency_ms": 15.261
+    },
+    {
+      "id": "stream_weather_lifecycle",
+      "category": "stream",
+      "passed": true,
+      "checks": {
+        "lifecycle": true,
+        "recovery": true
+      },
+      "errors": [],
+      "actual": {
+        "events": [
+          "request.accepted",
+          "planning.started",
+          "planning.completed",
+          "tool.started",
+          "tool.completed",
+          "verification.completed",
+          "response.completed"
+        ],
+        "sequences": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "answer": "当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "retry_count": 0,
+        "confirmation_status": "not_required"
+      },
+      "latency_ms": 15.233
+    },
+    {
+      "id": "stream_itinerary_two_tools",
+      "category": "stream",
+      "passed": true,
+      "checks": {
+        "lifecycle": true,
+        "recovery": true
+      },
+      "errors": [],
+      "actual": {
+        "events": [
+          "request.accepted",
+          "planning.started",
+          "planning.completed",
+          "tool.started",
+          "tool.started",
+          "tool.completed",
+          "tool.completed",
+          "verification.completed",
+          "response.completed"
+        ],
+        "sequences": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "answer": "推荐 Green Table Umeda，从京都步行约8分钟。 当前天气为 light rain，约 21.0°C，体感 20.0°C，建议准备雨具。",
+        "retry_count": 0,
+        "confirmation_status": "not_required"
+      },
+      "latency_ms": 15.237
+    },
+    {
+      "id": "stream_booking_waits",
+      "category": "stream",
+      "passed": true,
+      "checks": {
+        "lifecycle": true,
+        "recovery": true
+      },
+      "errors": [],
+      "actual": {
+        "events": [
+          "request.accepted",
+          "memory.recalled",
+          "planning.started",
+          "planning.completed",
+          "memory.updated",
+          "confirmation.awaiting",
+          "response.completed"
+        ],
+        "sequences": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "answer": "待确认操作：在大阪处理预订请求“帮我预约晚餐”（偏好：无额外偏好）。请通过确认接口明确 approve 或 reject；确认前不会向外部服务提交。",
+        "retry_count": 0,
+        "confirmation_status": "awaiting"
+      },
+      "latency_ms": 13.427
+    },
+    {
+      "id": "stream_failure_recovers_once",
+      "category": "stream",
+      "passed": true,
+      "checks": {
+        "lifecycle": true,
+        "recovery": true
+      },
+      "errors": [],
+      "actual": {
+        "events": [
+          "request.accepted",
+          "planning.started",
+          "planning.completed",
+          "tool.started",
+          "tool.completed",
+          "verification.completed",
+          "recovery.started",
+          "tool.started",
+          "tool.completed",
+          "verification.completed",
+          "response.completed"
+        ],
+        "sequences": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "answer": "工具暂时不可用，我没有编造结果。请稍后重试或换一个条件。",
+        "retry_count": 1,
+        "confirmation_status": "not_required"
+      },
+      "latency_ms": 13.013
+    }
+  ]
+}

@@ -19,6 +19,18 @@ ALLOWED_TOOLS = {
     "search_travel_knowledge",
 }
 
+VENUE_DISCOVERY_KEYWORDS = (
+    "附近",
+    "周围",
+    "找一家",
+    "推荐",
+    "有什么餐厅",
+    "nearby",
+    "near me",
+    "find a restaurant",
+    "recommend",
+)
+
 
 class PlannerResult(BaseModel):
     decision: PlanningDecision
@@ -97,6 +109,18 @@ def detect_intents(text: str) -> list[Intent]:
     for intent, keywords in keyword_groups:
         if any(keyword in normalized for keyword in keywords):
             detected.append(intent)
+
+    # A restaurant booking is an external action, not a venue-discovery request.
+    # Likewise, food-safety advice should not become dining unless the user also
+    # asks to find or recommend a venue.
+    if "booking" in detected and "dining" in detected:
+        detected.remove("dining")
+    if (
+        "safety" in detected
+        and "dining" in detected
+        and not any(keyword in normalized for keyword in VENUE_DISCOVERY_KEYWORDS)
+    ):
+        detected.remove("dining")
     return detected or ["general"]
 
 
@@ -112,18 +136,7 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
     }
     normalized = request.text.lower()
     venue_discovery = any(
-        keyword in normalized
-        for keyword in (
-            "附近",
-            "周围",
-            "找一家",
-            "推荐",
-            "有什么餐厅",
-            "nearby",
-            "near me",
-            "find a restaurant",
-            "recommend",
-        )
+        keyword in normalized for keyword in VENUE_DISCOVERY_KEYWORDS
     )
     if "booking" not in intents:
         if ("dining" in intents and venue_discovery) or "itinerary" in intents:
