@@ -9,7 +9,7 @@ from typing import Any
 from mcp import Client, StdioServerParameters
 
 from travel_agent.tools.base import ToolRegistry
-from travel_agent.tools.knowledge import LocalTravelKnowledgeTool
+from travel_agent.tools.knowledge import build_knowledge_tool_from_env
 from travel_agent.tools.mock import MockTranslateTool
 
 
@@ -171,7 +171,7 @@ def build_mcp_registry(
                 timeout_seconds=timeout,
             ),
             MockTranslateTool(),
-            LocalTravelKnowledgeTool(),
+            build_knowledge_tool_from_env(),
         ],
         target=resolved_target,
         timeout_seconds=timeout,
