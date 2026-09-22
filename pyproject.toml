@@ -34,6 +34,11 @@ rag = [
 travel-agent = "travel_agent.cli:main"
 travel-agent-mcp = "travel_agent.mcp_server:main"
 
+[project.urls]
+Repository = "https://github.com/zhanglelelelezhou/location-aware-travel-agent"
+Documentation = "https://github.com/zhanglelelelezhou/location-aware-travel-agent#readme"
+Issues = "https://github.com/zhanglelelelezhou/location-aware-travel-agent/issues"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

@@ -14,15 +14,15 @@
 
 ## 上传前需要本人决定
 
-- [ ] 选择公开仓库名称与 GitHub 账号
-- [ ] 选择仓库可见性（作品集建议 public）
+- [x] 仓库名称与账号：`zhanglelelelezhou/location-aware-travel-agent`
+- [x] 仓库可见性：Public
 - [ ] 确认 Git 提交作者姓名和邮箱适合公开展示
 
 ## 上传后验证
 
-- [ ] 设置 remote 并推送 `main`
+- [x] 设置 remote 并推送 `main`
 - [ ] 确认 GitHub Actions 的 Python matrix、系统验收和容器 job 全绿
-- [ ] 根据最终仓库 URL 添加 CI badge 与 `project.urls`
+- [x] 根据最终仓库 URL 添加 CI badge 与 `project.urls`
 - [ ] 在 GitHub About 中填写简介、topics 和项目主页
 - [ ] 创建 `v0.1.0` release，并在简历中使用固定仓库链接
 

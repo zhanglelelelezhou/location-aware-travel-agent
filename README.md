@@ -1,5 +1,9 @@
 # Location-Aware Travel Agent
 
+[![CI](https://github.com/zhanglelelelezhou/location-aware-travel-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/zhanglelelelezhou/location-aware-travel-agent/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](pyproject.toml)
+
 一个面向跨境旅行场景、可复现且可审计的 AI Agent。它把位置、偏好和旅行知识转成受约束的工具计划，并显式处理记忆、确认、失败恢复与执行追踪。
 
 > 作品集状态：核心功能与离线验收已完成。默认 Rule Planner + Mock tools 不需要 API Key；可选接入 DeepSeek、Open-Meteo、OpenStreetMap 和 MCP。项目是基于真实实习场景的个人重构，不包含原公司代码、数据或商业机密。
