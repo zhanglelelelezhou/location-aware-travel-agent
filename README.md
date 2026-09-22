@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 3，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI、带官方引用的旅行安全知识检索、MCP Server/Client、短期结构化会话记忆、一次性人工确认、SSE 状态事件、规则降级和冻结评测集。知识检索已完成 BM25、稠密向量和 RRF 混合召回的盲测消融；由于混合方案增益有限且拒答未改善，默认仍使用 BM25。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -91,6 +91,30 @@ curl -X POST http://127.0.0.1:8000/v1/sessions/demo-001/confirm \
 ```
 
 令牌绑定会话并在处理前原子消费，重复提交不会再次执行。默认 gateway 是明确标注的 dry-run，不会向外部商家发送请求；生产接入真实供应商时必须增加身份认证、持久化幂等键和状态对账。详见[会话记忆与人工确认](docs/session-memory.md)。
+
+## SSE 流式 Agent 事件
+
+`/v1/chat/stream` 返回具名、带序号和版本的 SSE 事件，而不是把最终文本按字符拆分。使用 `curl -N` 可实时看到规划、工具、校验、恢复、记忆和确认状态：
+
+```bash
+curl -N -X POST http://127.0.0.1:8000/v1/chat/stream \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"帮我安排大阪半日游","location":"大阪"}'
+```
+
+典型事件序列：
+
+```text
+request.accepted
+planning.started
+planning.completed
+tool.started
+tool.completed
+verification.completed
+response.completed
+```
+
+工具失败时会看到一次有界 `recovery.started`；booking 请求会进入 `confirmation.awaiting`，且确认前不会出现工具执行事件。最终 `response.completed` 仍包含完整 `AgentResponse`，普通 `/v1/chat` 保持兼容。详见 [SSE 事件协议](docs/streaming.md)。
 
 ## MCP Server
 
@@ -216,6 +240,8 @@ Request
   -> Verify -- failed once --> Recover -> Execute
        |
        +-- success / retry exhausted --> Store explicit facts -> Respond
+
+Every transition -> versioned SSE event (optional observer)
 ```
 
 核心接口与工具实现解耦，因此 Mock、真实 HTTP API 和 MCP 工具可以复用同一工作流。
@@ -242,9 +268,10 @@ Request
 - [x] 多语稠密检索与 RRF 混合召回盲测消融（负结果如实保留）
 - [x] 有界结构化会话记忆、TTL、会话隔离与清除接口
 - [x] booking pending action、独立 approve/reject 与一次性防重放
+- [x] 具名 SSE 生命周期事件、单调序号、keepalive 与最终响应
 - [ ] Rerank、按主题校准拒答和更大规模盲测
 - [ ] 持久化会话存储、真实 booking gateway 与幂等对账
-- [ ] SSE 流式响应
+- [ ] OpenTelemetry/Langfuse trace 导出与流式连接限流
 - [ ] 多次重复评测、参数准确率与 50+ 条评测集
 - [ ] Docker Compose、CI 和在线演示
 
@@ -254,6 +281,7 @@ Request
 - [工具契约](docs/tool-contracts.md)
 - [知识检索设计](docs/knowledge-retrieval.md)
 - [会话记忆与人工确认](docs/session-memory.md)
+- [SSE 事件协议](docs/streaming.md)
 - [MCP Server](docs/mcp-server.md)
 - [项目故事](docs/project-story.md)
 - [面试问题库](docs/interview-guide.md)

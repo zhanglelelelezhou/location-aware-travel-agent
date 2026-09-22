@@ -119,3 +119,10 @@ class AgentTrace(BaseModel):
 class AgentResponse(BaseModel):
     answer: str
     trace: AgentTrace
+
+
+class AgentEvent(BaseModel):
+    schema_version: Literal["1.0"] = "1.0"
+    sequence: int = Field(ge=1)
+    type: str = Field(pattern=r"^[a-z]+(?:\.[a-z]+)+$")
+    data: dict[str, Any] = Field(default_factory=dict)

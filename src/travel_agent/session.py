@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import uuid4
 
-from travel_agent.graph import run_agent
+from travel_agent.graph import AgentEventSink, run_agent
 from travel_agent.models import (
     AgentResponse,
     AgentTrace,
@@ -166,18 +166,38 @@ class ConversationService:
         self.store = store or InMemorySessionStore(clock=clock)
         self.booking_gateway = booking_gateway or DryRunBookingGateway()
 
-    def chat(self, request: ChatRequest) -> AgentResponse:
+    def chat(
+        self,
+        request: ChatRequest,
+        event_sink: AgentEventSink | None = None,
+    ) -> AgentResponse:
+        _emit(
+            event_sink,
+            "request.accepted",
+            {"session_id": request.session_id, "stateful": request.session_id is not None},
+        )
         if request.session_id is None:
             return run_agent(
                 _to_travel_request(request),
                 registry=self.registry,
                 planner=self.planner,
+                event_sink=event_sink,
             )
 
         session_id = request.session_id
         record = self.store.read(session_id)
         enriched, recalled_fields = _enrich_request(request, record.memory)
-        response = run_agent(enriched, registry=self.registry, planner=self.planner)
+        _emit(
+            event_sink,
+            "memory.recalled",
+            {"session_id": session_id, "fields": recalled_fields},
+        )
+        response = run_agent(
+            enriched,
+            registry=self.registry,
+            planner=self.planner,
+            event_sink=event_sink,
+        )
         updated_fields = _update_memory(record.memory, request)
         record.memory.turn_count += 1
 
@@ -201,6 +221,21 @@ class ConversationService:
             )
 
         self.store.write(session_id, record)
+        _emit(
+            event_sink,
+            "memory.updated",
+            {"session_id": session_id, "fields": updated_fields},
+        )
+        if pending_action_id is not None:
+            _emit(
+                event_sink,
+                "confirmation.awaiting",
+                {
+                    "session_id": session_id,
+                    "action_id": pending_action_id,
+                    "summary": record.pending_action.summary,
+                },
+            )
         trace = response.trace.model_copy(
             update={
                 "session_id": session_id,
@@ -371,6 +406,13 @@ def _copy_record(record: SessionRecord) -> SessionRecord:
         ),
         updated_at=record.updated_at,
     )
+
+
+def _emit(
+    sink: AgentEventSink | None, event_type: str, data: dict[str, Any]
+) -> None:
+    if sink is not None:
+        sink(event_type, data)
 
 
 def build_session_store_from_env() -> InMemorySessionStore:

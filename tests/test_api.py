@@ -1,3 +1,5 @@
+import json
+
 from fastapi.testclient import TestClient
 
 from travel_agent.api import app
@@ -82,3 +84,32 @@ def test_api_booking_requires_separate_one_time_confirmation() -> None:
     assert approved.json()["trace"]["confirmation_status"] == "approved"
     assert approved.json()["trace"]["confirmation_result"]["provider"] == "dry-run"
     assert replay.json()["trace"]["confirmation_status"] == "invalid_or_expired"
+
+
+def test_streaming_api_returns_named_sse_events_and_final_response() -> None:
+    with client.stream(
+        "POST",
+        "/v1/chat/stream",
+        json={"text": "大阪天气怎么样", "location": "大阪"},
+    ) as response:
+        body = "".join(response.iter_text())
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+    assert response.headers["cache-control"] == "no-cache"
+    blocks = [block for block in body.split("\n\n") if block and not block.startswith(":")]
+    event_names = [
+        next(line[7:] for line in block.splitlines() if line.startswith("event: "))
+        for block in blocks
+    ]
+    final_data_line = next(
+        line[6:]
+        for line in blocks[-1].splitlines()
+        if line.startswith("data: ")
+    )
+    final_event = json.loads(final_data_line)
+
+    assert event_names[0] == "request.accepted"
+    assert "tool.completed" in event_names
+    assert event_names[-1] == "response.completed"
+    assert "当前天气" in final_event["data"]["response"]["answer"]

@@ -32,6 +32,7 @@
 - [x] 多语稠密召回、RRF 混合检索和冻结语义改写/难负例盲测
 - [x] 有界短期会话记忆、TTL/LRU 与可审计召回
 - [x] booking 一次性确认令牌、approve/reject 和 dry-run gateway
+- [x] SSE 生命周期事件、keepalive、工具恢复与最终响应协议
 - [ ] 扩展语料后验证领域检索模型、拒答校准与 Rerank
 - [ ] 持久化记忆、并发版本控制与真实 booking 幂等对账
 - Prompt injection 防护

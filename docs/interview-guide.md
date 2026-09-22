@@ -131,3 +131,19 @@ LLM 不能生成任意 Overpass QL。adapter 只接收类别白名单、可信�
 ## 33. 这个记忆与确认实现离生产还有多远？
 
 当前是单进程内存 Store，TTL 和 LRU 适合作品集演示，但服务重启会丢失，多 worker 不共享，同一会话的 read-run-write 也没有跨进程版本控制。`session_id` 还是关联键而不是认证凭据，默认 booking gateway 只做 dry-run。生产环境需要认证绑定、Redis/PostgreSQL 的原子状态转换、加密与删除策略、供应商幂等键、审计日志和失败对账。
+
+## 34. 为什么 SSE 不直接流式输出模型 Token？
+
+这个 Agent 的主要等待来自 Planner 和外部工具，逐字输出只能展示回答生成，无法回答“系统现在在做什么”。我流式发送真实状态事件：规划开始/完成、工具开始/完成、校验、一次恢复、记忆和等待确认。最后一个事件仍带完整响应。以后可以在 `response.delta` 中追加 Token，但不能用 Token 流掩盖工具执行过程。
+
+## 35. 怎么证明 SSE 展示的不是另一套伪造进度？
+
+事件 sink 直接注入现有 LangGraph 节点和 ConversationService，工具事件由真正的 `invoke_many` 前后产生，恢复事件由原有 recover 节点产生。同步和流式接口共享 Planner、策略、注册表和响应模型。测试会把事件序列与最终 trace 对照，并验证 booking 在确认前没有任何 `tool.started`。
+
+## 36. SSE 为什么要有序号和 schema version？
+
+具名事件只解决语义，没有解决协议演进和客户端排序。单次连接内的 `sequence` 从 1 单调递增，便于前端检测遗漏或重复；`schema_version=1.0` 让字段升级可以显式兼容。当前还没有实现基于 `Last-Event-ID` 的断线续传，因为事件没有持久化，生产实现需要事件日志或 checkpoint 才能支持恢复。
+
+## 37. 当前 SSE 实现有哪些生产风险？
+
+底层工具仍是同步调用，所以当前每个流使用一个 daemon worker 和线程安全 Queue。客户端断连不会取消已开始的有界执行，也没有用户级连接数与队列容量限制。生产环境要改为 async adapter、断连取消、背压、速率限制和代理 idle timeout；同时对 `tool.completed` 和最终 trace 做权限控制与字段脱敏，避免把用户数据直接写入日志或展示给错误的客户端。
