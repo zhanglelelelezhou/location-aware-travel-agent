@@ -16,11 +16,25 @@ class ToolRegistry:
         self.provider = provider
 
     def invoke(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
+        tool = self._get_tool(name)
+        return tool.invoke(arguments)
+
+    def invoke_many(
+        self, calls: list[tuple[str, dict[str, Any]]]
+    ) -> list[dict[str, Any] | Exception]:
+        outcomes: list[dict[str, Any] | Exception] = []
+        for name, arguments in calls:
+            try:
+                outcomes.append(self.invoke(name, arguments))
+            except Exception as exc:  # noqa: BLE001
+                outcomes.append(exc)
+        return outcomes
+
+    def _get_tool(self, name: str) -> Tool:
         try:
-            tool = self._tools[name]
+            return self._tools[name]
         except KeyError as exc:
             raise ValueError(f"Unknown tool: {name}") from exc
-        return tool.invoke(arguments)
 
     @property
     def names(self) -> list[str]:

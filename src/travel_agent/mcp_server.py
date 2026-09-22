@@ -109,13 +109,24 @@ def main() -> None:
     )
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8001)
+    parser.add_argument(
+        "--provider", choices=["open-data", "mock"], default="open-data"
+    )
     args = parser.parse_args()
+
+    server = mcp
+    if args.provider == "mock":
+        from travel_agent.tools.mock import MockPoiSearchTool, MockWeatherTool
+
+        server = create_mcp_server(
+            weather_tool=MockWeatherTool(), poi_tool=MockPoiSearchTool()
+        )
 
     try:
         if args.transport == "stdio":
-            mcp.run()
+            server.run()
         else:
-            mcp.run(transport="streamable-http", host=args.host, port=args.port)
+            server.run(transport="streamable-http", host=args.host, port=args.port)
     except KeyboardInterrupt:
         pass
 

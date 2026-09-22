@@ -73,18 +73,27 @@ def _execute_with(registry: ToolRegistry):
     def execute(state: AgentState) -> dict[str, Any]:
         executions: list[ToolExecution] = []
         first_error: str | None = None
-        for call in state.get("plan", []):
-            try:
-                output = registry.invoke(call.name, call.arguments)
+        plan = state.get("plan", [])
+        outcomes = registry.invoke_many(
+            [(call.name, call.arguments) for call in plan]
+        )
+        for call, outcome in zip(plan, outcomes, strict=True):
+            if not isinstance(outcome, Exception):
                 executions.append(
-                    ToolExecution(name=call.name, arguments=call.arguments, output=output)
+                    ToolExecution(
+                        name=call.name, arguments=call.arguments, output=outcome
+                    )
                 )
-            # Tool adapters cross process/network boundaries and can raise provider-specific
-            # exceptions. This boundary normalizes them into an auditable execution result.
-            except Exception as exc:  # noqa: BLE001
-                first_error = f"{call.name}: {exc}"
+            else:
+                # Tool adapters cross process/network boundaries and can raise provider-specific
+                # exceptions. This boundary normalizes them into an auditable execution result.
+                first_error = first_error or f"{call.name}: {outcome}"
                 executions.append(
-                    ToolExecution(name=call.name, arguments=call.arguments, error=str(exc))
+                    ToolExecution(
+                        name=call.name,
+                        arguments=call.arguments,
+                        error=str(outcome),
+                    )
                 )
         return {"executions": executions, "error": first_error}
 

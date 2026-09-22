@@ -17,7 +17,9 @@ def main() -> None:
     parser.add_argument("--target-language", default="ja")
     parser.add_argument("--planner", choices=["rule", "llm"], default="rule")
     parser.add_argument(
-        "--tools", choices=["mock", "open-meteo", "open-data"], default="mock"
+        "--tools",
+        choices=["mock", "open-meteo", "open-data", "mcp"],
+        default="mock",
     )
     args = parser.parse_args()
 

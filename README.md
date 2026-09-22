@@ -2,7 +2,7 @@
 
 一个面向跨境旅行场景的位置感知智能体。它把用户当前位置、偏好和旅行知识转化为可审计的工具调用，并生成带依据的行动建议。
 
-> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI 工具、MCP Server、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
+> 当前状态：Phase 2，已具备规则基线、结构化 LLM Planner、确定性策略层、真实天气与 POI 工具、MCP Server/Client 执行链路、格式修复、规则降级和冻结留出集。仓库是基于真实实习场景进行的个人重构，不包含原公司的代码、数据或商业机密。默认规则模式不需要付费 API。
 
 ## 为什么它是 Agent，而不是聊天壳
 
@@ -91,6 +91,18 @@ python scripts/mcp_probe.py http://127.0.0.1:8001/mcp
 
 两个 MCP 工具都声明为只读、非破坏、幂等且访问外部数据。输入 JSON Schema 直接来自类型注解和 Pydantic 约束，非法类别、坐标、半径和结果数量会在调用 adapter 前被协议层拒绝。详见 [MCP Server 说明](docs/mcp-server.md)。
 
+LangGraph Agent 也可以作为 MCP Client 执行自己的工具计划。未设置远程地址时会自动启动 bundled stdio server；同一计划中的多个 MCP 工具复用一个会话：
+
+```bash
+travel-agent "帮我安排东京半日景点行程" \
+  --location 东京 \
+  --latitude 35.6895 \
+  --longitude 139.6917 \
+  --tools mcp
+```
+
+完全离线验证可设置 `MCP_SERVER_PROVIDER=mock`。连接已启动的 Streamable HTTP server 时设置 `MCP_SERVER_URL=http://127.0.0.1:8001/mcp`。当前只有天气与 POI 经过 MCP；翻译与旅行知识仍使用本地 Mock。
+
 启用真实 LLM Planner。复制 `.env.example` 为 `.env`，填写服务地址、模型名和密钥；`.env` 已被 Git 忽略：
 
 ```bash
@@ -168,6 +180,7 @@ Request
 - [x] 设备坐标优先、地名歧义拒绝与供应商错误归一化
 - [x] OpenStreetMap 真实 POI、距离排序与偏好证据过滤
 - [x] MCP Server：天气与 POI、stdio 与 Streamable HTTP
+- [x] MCP Client：Agent 工具执行、会话复用与错误归一化
 - [ ] MCP Server：翻译与旅行知识
 - [ ] 混合 RAG、Rerank 和引用溯源
 - [ ] SSE 流式响应、会话记忆和人工确认
