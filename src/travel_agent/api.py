@@ -1,12 +1,27 @@
-from fastapi import FastAPI
+from typing import Annotated
 
-from travel_agent.graph import run_agent
-from travel_agent.models import AgentResponse, TravelRequest
+from fastapi import FastAPI, Path
+
+from travel_agent.models import AgentResponse, ChatRequest, ConfirmationRequest
 from travel_agent.planner import build_planner_from_env
+from travel_agent.session import ConversationService, build_session_store_from_env
 from travel_agent.tools import build_tool_registry_from_env
 
 planner = build_planner_from_env()
 tool_registry = build_tool_registry_from_env()
+conversation_service = ConversationService(
+    registry=tool_registry,
+    planner=planner,
+    store=build_session_store_from_env(),
+)
+SessionId = Annotated[
+    str,
+    Path(
+        min_length=1,
+        max_length=100,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$",
+    ),
+]
 
 app = FastAPI(
     title="Location-Aware Travel Agent",
@@ -21,5 +36,18 @@ def health() -> dict[str, str]:
 
 
 @app.post("/v1/chat", response_model=AgentResponse)
-def chat(request: TravelRequest) -> AgentResponse:
-    return run_agent(request, registry=tool_registry, planner=planner)
+def chat(request: ChatRequest) -> AgentResponse:
+    return conversation_service.chat(request)
+
+
+@app.post(
+    "/v1/sessions/{session_id}/confirm",
+    response_model=AgentResponse,
+)
+def confirm(session_id: SessionId, request: ConfirmationRequest) -> AgentResponse:
+    return conversation_service.confirm(session_id, request)
+
+
+@app.delete("/v1/sessions/{session_id}")
+def clear_session(session_id: SessionId) -> dict[str, bool]:
+    return {"cleared": conversation_service.clear(session_id)}

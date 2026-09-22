@@ -30,9 +30,11 @@
 
 - [x] 官方来源知识快照、BM25 基线、引用溯源与独立检索评测
 - [x] 多语稠密召回、RRF 混合检索和冻结语义改写/难负例盲测
+- [x] 有界短期会话记忆、TTL/LRU 与可审计召回
+- [x] booking 一次性确认令牌、approve/reject 和 dry-run gateway
 - [ ] 扩展语料后验证领域检索模型、拒答校准与 Rerank
-- 会话摘要与用户偏好记忆
-- Prompt injection 防护和有副作用操作的人工确认
+- [ ] 持久化记忆、并发版本控制与真实 booking 幂等对账
+- Prompt injection 防护
 
 完成标准：引用正确率和记忆相关任务有独立评测，不以单个 Demo 代替结论。
 

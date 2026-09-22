@@ -92,7 +92,7 @@ def detect_intents(text: str) -> list[Intent]:
             ),
         ),
         ("weather", ("天气", "气温", "weather")),
-        ("booking", ("预订", "预约", "book", "reserve")),
+        ("booking", ("预订", "预约", "订一桌", "订餐", "订位", "book", "reserve")),
     ]
     for intent, keywords in keyword_groups:
         if any(keyword in normalized for keyword in keywords):

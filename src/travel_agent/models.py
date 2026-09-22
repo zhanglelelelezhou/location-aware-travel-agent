@@ -31,6 +31,24 @@ class TravelRequest(BaseModel):
         return self
 
 
+class ChatRequest(TravelRequest):
+    session_id: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=100,
+        pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$",
+    )
+
+
+class ConfirmationRequest(BaseModel):
+    action_id: str = Field(
+        min_length=32,
+        max_length=32,
+        pattern=r"^[a-f0-9]{32}$",
+    )
+    decision: Literal["approve", "reject"]
+
+
 class PlannedToolCall(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -83,6 +101,19 @@ class AgentTrace(BaseModel):
     policy_adjustments: list[str] = Field(default_factory=list)
     missing_fields: list[str] = Field(default_factory=list)
     needs_confirmation: bool = False
+    session_id: str | None = None
+    memory_recalled: list[str] = Field(default_factory=list)
+    memory_updated: list[str] = Field(default_factory=list)
+    pending_action_id: str | None = None
+    confirmation_status: Literal[
+        "not_required",
+        "awaiting",
+        "approved",
+        "rejected",
+        "invalid_or_expired",
+        "failed",
+    ] = "not_required"
+    confirmation_result: dict[str, Any] | None = None
 
 
 class AgentResponse(BaseModel):
