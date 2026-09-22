@@ -155,7 +155,17 @@ def _respond(state: AgentState) -> dict[str, Any]:
             elif execution.name == "translate_phrase":
                 parts.append(f"可向店员询问：{output['translated_text']}")
             elif execution.name == "search_travel_knowledge" and output.get("passages"):
-                parts.append(output["passages"][0]["text"])
+                cited_passages: list[str] = []
+                for passage in output["passages"][:2]:
+                    citation = ""
+                    if passage.get("title") and passage.get("source"):
+                        citation = f"（来源：[{passage['title']}]({passage['source']})）"
+                    cited_passages.append(f"{passage['text']}{citation}")
+                parts.append(" ".join(cited_passages))
+            elif execution.name == "search_travel_knowledge":
+                parts.append(
+                    "当前官方知识快照中没有找到足够相关的依据，请查看对应机构最新信息。"
+                )
         answer = " ".join(parts) or "我已理解请求，但当前 Mock 工具还不支持这个场景。"
 
     response = AgentResponse(

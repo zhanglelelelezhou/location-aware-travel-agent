@@ -149,6 +149,15 @@ def test_safety_advice_does_not_trigger_unrequested_search_or_translation() -> N
     assert [call.name for call in response.trace.plan] == ["search_travel_knowledge"]
 
 
+def test_restaurant_allergy_advice_does_not_require_a_location() -> None:
+    response = run_agent(
+        TravelRequest(text="我对花生严重过敏，在日本餐厅点餐要注意什么")
+    )
+
+    assert response.trace.missing_fields == []
+    assert [call.name for call in response.trace.plan] == ["search_travel_knowledge"]
+
+
 def test_weather_provider_failure_is_exposed_without_fabricated_result() -> None:
     class FailingWeatherTool:
         name = "get_weather"

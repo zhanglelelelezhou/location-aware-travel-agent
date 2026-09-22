@@ -9,7 +9,8 @@ from typing import Any
 from mcp import Client, StdioServerParameters
 
 from travel_agent.tools.base import ToolRegistry
-from travel_agent.tools.mock import MockTranslateTool, MockTravelKnowledgeTool
+from travel_agent.tools.knowledge import LocalTravelKnowledgeTool
+from travel_agent.tools.mock import MockTranslateTool
 
 
 class MCPToolError(RuntimeError):
@@ -170,7 +171,7 @@ def build_mcp_registry(
                 timeout_seconds=timeout,
             ),
             MockTranslateTool(),
-            MockTravelKnowledgeTool(),
+            LocalTravelKnowledgeTool(),
         ],
         target=resolved_target,
         timeout_seconds=timeout,

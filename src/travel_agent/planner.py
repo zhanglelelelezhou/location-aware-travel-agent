@@ -64,7 +64,33 @@ def detect_intents(text: str) -> list[Intent]:
         ),
         ("itinerary", ("行程", "景点", "安排", "路线", "itinerary")),
         ("translation", ("翻译", "日语", "怎么说", "translate")),
-        ("safety", ("过敏", "禁忌", "风险", "allergy", "safe")),
+        (
+            "safety",
+            (
+                "过敏",
+                "禁忌",
+                "风险",
+                "地震",
+                "海啸",
+                "护照丢",
+                "被盗",
+                "报警",
+                "救护车",
+                "生病",
+                "医院",
+                "紧急",
+                "allergy",
+                "safe",
+                "earthquake",
+                "tsunami",
+                "lost passport",
+                "police",
+                "ambulance",
+                "hospital",
+                "illness",
+                "emergency",
+            ),
+        ),
         ("weather", ("天气", "气温", "weather")),
         ("booking", ("预订", "预约", "book", "reserve")),
     ]
@@ -86,7 +112,18 @@ def build_rule_decision(request: TravelRequest) -> PlanningDecision:
     }
     normalized = request.text.lower()
     venue_discovery = any(
-        keyword in normalized for keyword in ("餐厅", "附近", "周围", "restaurant", "nearby", "店")
+        keyword in normalized
+        for keyword in (
+            "附近",
+            "周围",
+            "找一家",
+            "推荐",
+            "有什么餐厅",
+            "nearby",
+            "near me",
+            "find a restaurant",
+            "recommend",
+        )
     )
     if "booking" not in intents:
         if ("dining" in intents and venue_discovery) or "itinerary" in intents:

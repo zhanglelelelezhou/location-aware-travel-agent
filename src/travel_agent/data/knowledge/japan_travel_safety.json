@@ -1,0 +1,59 @@
+{
+  "snapshot_date": "2026-09-22",
+  "documents": [
+    {
+      "id": "jp-food-allergy-communication",
+      "title": "日本食品标签与多语言过敏沟通表",
+      "text": "在日本销售的食品标签以日文标示。日本消费者厅提供英文、中文和韩文的食品过敏沟通表；有严重食物过敏的旅行者可提前下载，在购买食品或点餐时明确标出需要避开的过敏原。",
+      "source": "https://www.caa.go.jp/en/policy/food_labeling/",
+      "publisher": "Consumer Affairs Agency, Government of Japan",
+      "topics": ["food_allergy", "food_label", "communication"],
+      "keywords": ["食物过敏", "食品标签", "过敏沟通表", "allergy communication sheet", "food label", "Japanese labels"]
+    },
+    {
+      "id": "jp-restaurant-allergy-cross-contact",
+      "title": "在餐厅确认过敏原与意外混入风险",
+      "text": "餐厅和外卖场景可能发生过敏原的意外混入或交叉接触。点餐时应同时确认配料、调味料和共用厨具等风险；如果店员无法可靠确认，严重过敏者不应把“可能不含”当作安全保证。",
+      "source": "https://www.caa.go.jp/policies/policy/food_labeling/food_sanitation/allergy/efforts",
+      "publisher": "Consumer Affairs Agency, Government of Japan",
+      "topics": ["food_allergy", "restaurant", "cross_contact"],
+      "keywords": ["餐厅", "点餐", "配料", "交叉污染", "花生", "allergy", "restaurant", "cross contact", "ingredients"]
+    },
+    {
+      "id": "jp-emergency-numbers",
+      "title": "日本紧急电话与访日游客热线",
+      "text": "在日本遇到紧急警务事件拨打 110，火灾或需要救护车拨打 119。JNTO 访日游客热线 050-3816-2787 全年全天提供英文、中文和韩文支持，可协助处理事故、疾病、自然灾害和一般旅行咨询。",
+      "source": "https://www.japan.travel/en/plan/hotline/",
+      "publisher": "Japan National Tourism Organization",
+      "topics": ["emergency", "police", "ambulance", "hotline"],
+      "keywords": ["报警", "警察", "救护车", "消防", "紧急电话", "110", "119", "police", "ambulance", "fire", "visitor hotline"]
+    },
+    {
+      "id": "jp-earthquake-actions",
+      "title": "日本地震发生时的基本行动",
+      "text": "地震发生时先保护头部并确保自身安全。震动停止后听从现场工作人员指示；确认安全后仍要留意余震和次生灾害，再决定是否返回住宿地点。沿海地区还应关注海啸警报和疏散指示。",
+      "source": "https://www.japan.travel/en/japan-safe-travel-information/earthquake/",
+      "publisher": "Japan National Tourism Organization",
+      "topics": ["earthquake", "disaster", "evacuation"],
+      "keywords": ["地震", "余震", "海啸", "避难", "疏散", "earthquake", "aftershock", "tsunami", "evacuation", "protect head"]
+    },
+    {
+      "id": "jp-lost-passport-police-report",
+      "title": "在日本遗失护照或财物后的处理",
+      "text": "护照或财物被盗、遗失时，可前往附近交番或警察署报案。补办护照或办理部分保险理赔通常需要警方出具的报案记录；护照补发还应联系本国使领馆，并事先留存证件副本和相关联系方式。",
+      "source": "https://www.japan.travel/en/plan/emergencies/",
+      "publisher": "Japan National Tourism Organization",
+      "topics": ["lost_property", "passport", "police_report", "embassy"],
+      "keywords": ["护照丢失", "财物被盗", "交番", "警察署", "报案记录", "使领馆", "lost passport", "theft", "police report", "embassy", "koban"]
+    },
+    {
+      "id": "jp-medical-assistance",
+      "title": "访日旅行者就医与疾病求助",
+      "text": "发生危及生命的医疗紧急情况应拨打 119。其他疾病或就医信息需求可联系 JNTO 访日游客热线 050-3816-2787；该热线全年全天提供英文、中文和韩文支持，JNTO 也提供面向旅行者的医疗机构查找指南。",
+      "source": "https://www.japan.travel/en/plan/emergencies/",
+      "publisher": "Japan National Tourism Organization",
+      "topics": ["medical", "illness", "hospital", "hotline"],
+      "keywords": ["生病", "医院", "就医", "医疗机构", "疾病", "急救", "doctor", "hospital", "medical help", "illness", "119"]
+    }
+  ]
+}
