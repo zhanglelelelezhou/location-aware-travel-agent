@@ -27,7 +27,7 @@ dev = [
   "ruff>=0.8,<1",
 ]
 rag = [
-  "fastembed>=0.8,<0.9",
+  "fastembed>=0.8,<0.10",
 ]
 
 [project.scripts]
